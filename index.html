@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Divya ❤️</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Soft glow background -->
+    <div class="bg">
+      <div class="blob b1"></div>
+      <div class="blob b2"></div>
+      <div class="blob b3"></div>
+      <div class="grain"></div>
+    </div>
+
+    <!-- Floating nav -->
+    <div class="floatingNav" aria-label="Section navigation">
+      <button class="navBtn" id="prevBtn" aria-label="Previous">‹</button>
+      <div class="navDots" id="navDots" aria-hidden="true"></div>
+      <button class="navBtn" id="nextBtn" aria-label="Next">›</button>
+    </div>
+
+    <!-- YES celebration overlay -->
+    <div class="celebrate" id="celebrate" aria-hidden="true">
+      <div class="celebrateInner">
+        <div class="celebrateTitle">YAYYYYY 💖</div>
+        <div class="celebrateSub">I choose you again and again.</div>
+      </div>
+    </div>
+
+    <!-- Hearts layer -->
+    <div class="heartsLayer" id="heartsLayer" aria-hidden="true"></div>
+
+    <!-- Modal -->
+    <div
+      class="modal"
+      id="modal"
+      aria-hidden="true"
+      role="dialog"
+      aria-modal="true">
+      <div class="modalCard">
+        <button class="modalClose" id="modalClose" aria-label="Close">✕</button>
+        <div class="modalBody" id="modalBody"></div>
+      </div>
+    </div>
+
+    <!-- Main scroll snap container -->
+    <main class="reel" id="reel">
+      <!-- 1) Intro -->
+      <section class="snap section intro" data-title="Intro">
+        <div class="content">
+          <div class="tag">for Divya ❤️</div>
+          <h1 class="title">Hey you.</h1>
+          <p class="subtitle">
+            This is a tiny reel of feelings… slow, soft, cinematic — and very
+            you.
+          </p>
+
+          <div class="ctaRow">
+            <button class="pill" id="startBtn">Start</button>
+            <div class="hint">Scroll ↓ (or use arrows)</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2) Secret Note (Envelope v2) -->
+      <section class="snap section note" data-title="Secret note">
+        <div class="content center">
+          <h2 class="h2">A secret note</h2>
+          <p class="p">Tap the envelope. (No rushing…)</p>
+
+          <div class="envelopeWrap" id="envelope">
+            <div class="envShadow"></div>
+
+            <div class="envelope">
+              <div class="envBack"></div>
+
+              <!-- flap -->
+              <div class="envFlap"></div>
+
+              <!-- body/front -->
+              <div class="envFront"></div>
+
+              <!-- heart seal -->
+              <div class="seal" aria-hidden="true">
+                <span>❤</span>
+              </div>
+
+              <!-- letter -->
+              <div class="letter" id="letter">
+                <div class="letterInner">
+                  <div class="letterTop">Divya,</div>
+                  <div class="letterText">
+                    I don’t want perfect. I want <b>us</b> — real, soft, silly,
+                    safe.<br />
+                    I choose you again and again.<br /><br />
+                    (and yes, I made this like an Instagram reel because… you.)
+                  </div>
+                  <div class="letterBottom">— Yours 💗</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="microHint">Tap again to close ✨</div>
+        </div>
+      </section>
+
+      <!-- 3) Gifts -->
+      <section class="snap section gifts" data-title="Gifts">
+        <div class="content">
+          <h2 class="h2">Gifts for you 🎁</h2>
+          <p class="p">They unlock after you say <b>YES</b> 😌</p>
+
+          <div class="giftGrid" id="giftGrid">
+            <button class="giftCard locked" data-gift="1">
+              <div class="giftTop">
+                <div class="giftBadge">Gift 1</div>
+                <div class="giftIcon">🎀</div>
+              </div>
+              <div class="giftTitle">A tiny surprise</div>
+              <div class="giftSub">tap to open</div>
+              <div class="lockOverlay"><span>🔒 Locked</span></div>
+            </button>
+
+            <button class="giftCard locked" data-gift="2">
+              <div class="giftTop">
+                <div class="giftBadge">Gift 2</div>
+                <div class="giftIcon">💌</div>
+              </div>
+              <div class="giftTitle">A soft promise</div>
+              <div class="giftSub">tap to open</div>
+              <div class="lockOverlay"><span>🔒 Locked</span></div>
+            </button>
+
+            <button class="giftCard locked" data-gift="3">
+              <div class="giftTop">
+                <div class="giftBadge">Gift 3</div>
+                <div class="giftIcon">🌙</div>
+              </div>
+              <div class="giftTitle">A midnight wish</div>
+              <div class="giftSub">tap to open</div>
+              <div class="lockOverlay"><span>🔒 Locked</span></div>
+            </button>
+          </div>
+
+          <div class="finePrint">
+            Tip: after YES, gifts will unlock + stay unlocked.
+          </div>
+        </div>
+      </section>
+
+      <!-- 4) Memories (Gift → Reveal) -->
+      <section class="snap section memories" data-title="Memories">
+        <div class="content">
+          <h2 class="h2">Memories ✨</h2>
+          <p class="p">Tap a tile. It reveals slowly (blur → clear).</p>
+
+          <div class="memoryGrid" id="memoryGrid">
+            <!-- Images -->
+            <button
+              class="memoryTile"
+              data-type="image"
+              data-src="assets/ourImages/1.jpg">
+              <div class="memoryCover">
+                <div class="coverIcon">🎁</div>
+                <div class="coverText">Tap to reveal</div>
+              </div>
+              <img
+                class="memoryMedia"
+                src="assets/ourImages/1.jpg"
+                alt="Memory 1" />
+            </button>
+
+            <button
+              class="memoryTile"
+              data-type="image"
+              data-src="assets/ourImages/2.jpg">
+              <div class="memoryCover">
+                <div class="coverIcon">🎁</div>
+                <div class="coverText">Tap to reveal</div>
+              </div>
+              <img
+                class="memoryMedia"
+                src="assets/ourImages/2.jpg"
+                alt="Memory 2" />
+            </button>
+
+            <button
+              class="memoryTile"
+              data-type="image"
+              data-src="assets/ourImages/3.jpg">
+              <div class="memoryCover">
+                <div class="coverIcon">🎁</div>
+                <div class="coverText">Tap to reveal</div>
+              </div>
+              <img
+                class="memoryMedia"
+                src="assets/ourImages/3.jpg"
+                alt="Memory 3" />
+            </button>
+
+            <button
+              class="memoryTile"
+              data-type="image"
+              data-src="assets/ourImages/4.jpg">
+              <div class="memoryCover">
+                <div class="coverIcon">🎁</div>
+                <div class="coverText">Tap to reveal</div>
+              </div>
+              <img
+                class="memoryMedia"
+                src="assets/ourImages/4.jpg"
+                alt="Memory 4" />
+            </button>
+
+            <button
+              class="memoryTile"
+              data-type="image"
+              data-src="assets/ourImages/5.jpg">
+              <div class="memoryCover">
+                <div class="coverIcon">🎁</div>
+                <div class="coverText">Tap to reveal</div>
+              </div>
+              <img
+                class="memoryMedia"
+                src="assets/ourImages/5.jpg"
+                alt="Memory 5" />
+            </button>
+
+            <button
+              class="memoryTile"
+              data-type="image"
+              data-src="assets/ourImages/6.jpg">
+              <div class="memoryCover">
+                <div class="coverIcon">🎁</div>
+                <div class="coverText">Tap to reveal</div>
+              </div>
+              <img
+                class="memoryMedia"
+                src="assets/ourImages/6.jpg"
+                alt="Memory 6" />
+            </button>
+
+            <button
+              class="memoryTile"
+              data-type="image"
+              data-src="assets/ourImages/7.jpg">
+              <div class="memoryCover">
+                <div class="coverIcon">🎁</div>
+                <div class="coverText">Tap to reveal</div>
+              </div>
+              <img
+                class="memoryMedia"
+                src="assets/ourImages/7.jpg"
+                alt="Memory 7" />
+            </button>
+
+            <button
+              class="memoryTile"
+              data-type="image"
+              data-src="assets/ourImages/8.jpg">
+              <div class="memoryCover">
+                <div class="coverIcon">🎁</div>
+                <div class="coverText">Tap to reveal</div>
+              </div>
+              <img
+                class="memoryMedia"
+                src="assets/ourImages/8.jpg"
+                alt="Memory 8" />
+            </button>
+
+            <!-- Example video tile (optional) -->
+            <!--
+          <button class="memoryTile video" data-type="video" data-src="assets/ourVideos/1.mp4">
+            <div class="memoryCover">
+              <div class="coverIcon">▶</div>
+              <div class="coverText">Tap to play</div>
+            </div>
+            <div class="videoThumb">
+              <div class="playPulse">▶</div>
+            </div>
+          </button>
+          --></div>
+
+          <!-- <div class="finePrint">
+            Want videos? Uncomment the sample tile and add your mp4 in
+            <b>assets/ourVideos/</b>. -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 5) Soundtrack -->
+      <section class="snap section music" data-title="Soundtrack">
+        <div class="content">
+          <h2 class="h2">Our Soundtrack 🎶</h2>
+          <p class="p">Pick a track. Let it play like a scene.</p>
+
+          <div class="playerCard">
+            <div class="playerHeader">
+              <div class="nowLabel">Now playing</div>
+              <div class="nowTitle" id="nowTitle">—</div>
+              <div class="nowMeta" id="nowMeta">—</div>
+            </div>
+
+            <div class="progressWrap">
+              <span class="time" id="curTime">0:00</span>
+              <input type="range" id="seek" min="0" max="100" value="0" />
+              <span class="time" id="durTime">0:00</span>
+            </div>
+
+            <div class="playerControls">
+              <button class="btn ghost" id="shuffleBtn">Shuffle</button>
+              <button class="btn" id="playPauseBtn">Play</button>
+              <button class="btn ghost" id="stopBtn">Stop</button>
+            </div>
+
+            <div class="trackList" id="trackList"></div>
+          </div>
+
+          <audio id="audio"></audio>
+        </div>
+      </section>
+
+      <!-- 6) Valentine Question -->
+      <section class="snap section question" data-title="Question">
+        <div class="content center">
+          <div class="tag">Final question</div>
+          <h2 class="h2 big">Will you be my Valentine? 💘</h2>
+          <p class="p">Be honest. But also… choose wisely 😌</p>
+
+          <div class="qaBox" id="qaBox">
+            <button class="yesBtn" id="yesBtn">YES 💖</button>
+            <button class="noBtn" id="noBtn">NO 🙈</button>
+          </div>
+
+          <div class="tease" id="tease">🙂</div>
+          <div class="finePrint">
+            NO button moves on click (not hover) + YES grows each NO.
+          </div>
+        </div>
+      </section>
+
+      <!-- 7) Outro -->
+      <section class="snap section outro" data-title="Outro">
+        <div class="content center">
+          <h2 class="h2">That’s it… for now.</h2>
+          <p class="p">But if it was up to me, I’d replay this forever.</p>
+          <button class="pill" id="replayBtn">Replay from top</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
