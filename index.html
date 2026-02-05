@@ -2,357 +2,410 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Divya ❤️</title>
-    <link rel="stylesheet" href="style.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600;700&family=Great+Vibes&display=swap"
+      rel="stylesheet" />
+
+    <link rel="stylesheet" href="./style.css" />
   </head>
+
   <body>
-    <!-- Soft glow background -->
-    <div class="bg">
-      <div class="blob b1"></div>
-      <div class="blob b2"></div>
-      <div class="blob b3"></div>
-      <div class="grain"></div>
-    </div>
+    <!-- Soft background blobs -->
+    <div class="blob b1" aria-hidden="true"></div>
+    <div class="blob b2" aria-hidden="true"></div>
+    <div class="blob b3" aria-hidden="true"></div>
 
-    <!-- Floating nav -->
-    <div class="floatingNav" aria-label="Section navigation">
-      <button class="navBtn" id="prevBtn" aria-label="Previous">‹</button>
-      <div class="navDots" id="navDots" aria-hidden="true"></div>
-      <button class="navBtn" id="nextBtn" aria-label="Next">›</button>
-    </div>
+    <header class="topbar">
+      <div class="brand">for Divya</div>
 
-    <!-- YES celebration overlay -->
-    <div class="celebrate" id="celebrate" aria-hidden="true">
-      <div class="celebrateInner">
-        <div class="celebrateTitle">YAYYYYY 💖</div>
-        <div class="celebrateSub">I choose you again and again.</div>
+      <div class="right">
+        <button
+          class="iconBtn"
+          id="musicToggle"
+          type="button"
+          aria-label="Toggle music">
+          ♪
+        </button>
+        <div class="dots" id="dots" aria-label="progress"></div>
       </div>
-    </div>
+    </header>
 
-    <!-- Hearts layer -->
-    <div class="heartsLayer" id="heartsLayer" aria-hidden="true"></div>
-
-    <!-- Modal -->
-    <div
-      class="modal"
-      id="modal"
-      aria-hidden="true"
-      role="dialog"
-      aria-modal="true">
-      <div class="modalCard">
-        <button class="modalClose" id="modalClose" aria-label="Close">✕</button>
-        <div class="modalBody" id="modalBody"></div>
-      </div>
-    </div>
-
-    <!-- Main scroll snap container -->
-    <main class="reel" id="reel">
-      <!-- 1) Intro -->
-      <section class="snap section intro" data-title="Intro">
-        <div class="content">
-          <div class="tag">for Divya ❤️</div>
-          <h1 class="title">Hey you.</h1>
-          <p class="subtitle">
-            This is a tiny reel of feelings… slow, soft, cinematic — and very
-            you.
+    <!-- Scroll Story -->
+    <main class="story" id="story">
+      <!-- 1) Hook -->
+      <section class="panel" id="p1" data-title="Hook">
+        <div class="card center">
+          <img
+            class="sticker"
+            src="./assets/GifData/RoseCute.gif"
+            alt="cute gif" />
+          <p class="kicker">slow down…</p>
+          <h1 class="name">Miss Divya <span aria-hidden="true">❤️</span></h1>
+          <p class="hero-line">
+            Kaisi ho, khana khaya 😊…<br />
+            <span class="accent">I MISSSS YOU ALOT .</span>
           </p>
-
-          <div class="ctaRow">
-            <button class="pill" id="startBtn">Start</button>
-            <div class="hint">Scroll ↓ (or use arrows)</div>
-          </div>
+          <p class="subtle centerText">Scroll slowly ↓</p>
         </div>
       </section>
 
-      <!-- 2) Secret Note (Envelope v2) -->
-      <section class="snap section note" data-title="Secret note">
-        <div class="content center">
-          <h2 class="h2">A secret note</h2>
-          <p class="p">Tap the envelope. (No rushing…)</p>
+      <!-- 1B) Happy Valentine -->
+      <section class="panel" id="p1b" data-title="Valentine">
+        <div class="card center valentCard">
+          <div class="valentTop">Happy Valentine's Day</div>
+          <h2 class="valentTitle">Divya <span aria-hidden="true">❤️</span></h2>
+          <p class="valentLine">Today and every day — <b>I pick you.</b></p>
+          <div class="valentMini">
+            <span class="spark">✨</span>
+            <span>Scroll down for your little surprise</span>
+            <span class="spark">✨</span>
+          </div>
+        </div>
+      </section>
+      <!-- 2) Feelings -->
+      <section class="panel" id="p2" data-title="Feelings">
+        <div class="card center">
+          <img
+            class="sticker"
+            src="./assets/GifData/heart.gif"
+            alt="cute gif" />
+          <p class="kicker">a quiet truth</p>
+          <p class="big">I choose you.</p>
+          <p class="big">Again…</p>
+          <p class="big">and again.</p>
+          <p class="subtle">No noise. Just intention.</p>
+        </div>
+      </section>
 
-          <div class="envelopeWrap" id="envelope">
-            <div class="envShadow"></div>
-
-            <div class="envelope">
-              <div class="envBack"></div>
-
-              <!-- flap -->
-              <div class="envFlap"></div>
-
-              <!-- body/front -->
-              <div class="envFront"></div>
-
-              <!-- heart seal -->
-              <div class="seal" aria-hidden="true">
-                <span>❤</span>
-              </div>
-
-              <!-- letter -->
-              <div class="letter" id="letter">
-                <div class="letterInner">
-                  <div class="letterTop">Divya,</div>
-                  <div class="letterText">
-                    I don’t want perfect. I want <b>us</b> — real, soft, silly,
-                    safe.<br />
-                    I choose you again and again.<br /><br />
-                    (and yes, I made this like an Instagram reel because… you.)
-                  </div>
-                  <div class="letterBottom">— Yours 💗</div>
-                </div>
-              </div>
+      <!-- 3) Special -->
+      <section class="panel" id="p3" data-title="Special">
+        <div class="card">
+          <div class="rowTop">
+            <img
+              class="sticker sm"
+              src="./assets/GifData/cutieSwal3.gif"
+              alt="cute gif" />
+            <div>
+              <p class="kicker">why you feel different</p>
+              <h2 class="title">Reasons I adore you</h2>
             </div>
           </div>
 
-          <div class="microHint">Tap again to close ✨</div>
-        </div>
-      </section>
-
-      <!-- 3) Gifts -->
-      <section class="snap section gifts" data-title="Gifts">
-        <div class="content">
-          <h2 class="h2">Gifts for you 🎁</h2>
-          <p class="p">They unlock after you say <b>YES</b> 😌</p>
-
-          <div class="giftGrid" id="giftGrid">
-            <button class="giftCard locked" data-gift="1">
-              <div class="giftTop">
-                <div class="giftBadge">Gift 1</div>
-                <div class="giftIcon">🎀</div>
-              </div>
-              <div class="giftTitle">A tiny surprise</div>
-              <div class="giftSub">tap to open</div>
-              <div class="lockOverlay"><span>🔒 Locked</span></div>
-            </button>
-
-            <button class="giftCard locked" data-gift="2">
-              <div class="giftTop">
-                <div class="giftBadge">Gift 2</div>
-                <div class="giftIcon">💌</div>
-              </div>
-              <div class="giftTitle">A soft promise</div>
-              <div class="giftSub">tap to open</div>
-              <div class="lockOverlay"><span>🔒 Locked</span></div>
-            </button>
-
-            <button class="giftCard locked" data-gift="3">
-              <div class="giftTop">
-                <div class="giftBadge">Gift 3</div>
-                <div class="giftIcon">🌙</div>
-              </div>
-              <div class="giftTitle">A midnight wish</div>
-              <div class="giftSub">tap to open</div>
-              <div class="lockOverlay"><span>🔒 Locked</span></div>
-            </button>
-          </div>
-
-          <div class="finePrint">
-            Tip: after YES, gifts will unlock + stay unlocked.
+          <div class="chips">
+            <div class="chip">You calm my chaos</div>
+            <div class="chip">You understand without explaining</div>
+            <div class="chip">You make love feel safe</div>
+            <div class="chip">You feel like home</div>
           </div>
         </div>
       </section>
 
-      <!-- 4) Memories (Gift → Reveal) -->
-      <section class="snap section memories" data-title="Memories">
-        <div class="content">
-          <h2 class="h2">Memories ✨</h2>
-          <p class="p">Tap a tile. It reveals slowly (blur → clear).</p>
+      <!-- 4) Secret Note -->
+      <section class="panel" id="p4" data-title="Secret Note">
+        <div class="card center">
+          <p class="kicker">a secret note for you 💌</p>
+          <h2 class="title centerTitle">Click the envelope</h2>
+          <!-- PERFECT ENVELOPE V2 -->
+          <button
+            class="envelope2"
+            id="envelopeBtn"
+            type="button"
+            aria-label="Open secret note">
+            <span class="env2-back"></span>
+
+            <span class="env2-letter" id="envLetter">
+              <span class="letterTitle">Divya…</span>
+              <span class="letterText">
+                I love how you make the world softer.<br />
+                I don’t just like you… I feel safe with you.<br /><br />
+                And yes — I choose you. Always. ❤️
+              </span>
+            </span>
+
+            <span class="env2-fold env2-left"></span>
+            <span class="env2-fold env2-right"></span>
+            <span class="env2-fold env2-bottom"></span>
+
+            <span class="env2-flap"></span>
+            <span class="env2-seal" aria-hidden="true">♥</span>
+            <span class="env2-shine" aria-hidden="true"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 5) Memories -->
+      <section class="panel" id="p5" data-title="Memories">
+        <div class="card">
+          <p class="kicker">our favorite memories 🎁</p>
+          <h2 class="title">Tap each gift to reveal</h2>
+          <p class="subtle">First hidden… then smooth fade-in ✨</p>
 
           <div class="memoryGrid" id="memoryGrid">
-            <!-- Images -->
             <button
-              class="memoryTile"
-              data-type="image"
-              data-src="assets/ourImages/1.jpg">
-              <div class="memoryCover">
-                <div class="coverIcon">🎁</div>
-                <div class="coverText">Tap to reveal</div>
-              </div>
-              <img
-                class="memoryMedia"
-                src="assets/ourImages/1.jpg"
-                alt="Memory 1" />
+              class="memoryGift"
+              data-img="./assets/ourImages/1.jpg"
+              type="button">
+              <span class="giftIcon">🎁</span>
+              <span class="giftLabel">Memory 1</span>
+              <span class="reveal"></span>
             </button>
 
             <button
-              class="memoryTile"
-              data-type="image"
-              data-src="assets/ourImages/2.jpg">
-              <div class="memoryCover">
-                <div class="coverIcon">🎁</div>
-                <div class="coverText">Tap to reveal</div>
-              </div>
-              <img
-                class="memoryMedia"
-                src="assets/ourImages/2.jpg"
-                alt="Memory 2" />
+              class="memoryGift"
+              data-img="./assets/ourImages/2.jpg"
+              type="button">
+              <span class="giftIcon">🎁</span>
+              <span class="giftLabel">Memory 2</span>
+              <span class="reveal"></span>
             </button>
 
             <button
-              class="memoryTile"
-              data-type="image"
-              data-src="assets/ourImages/3.jpg">
-              <div class="memoryCover">
-                <div class="coverIcon">🎁</div>
-                <div class="coverText">Tap to reveal</div>
-              </div>
-              <img
-                class="memoryMedia"
-                src="assets/ourImages/3.jpg"
-                alt="Memory 3" />
+              class="memoryGift"
+              data-img="./assets/ourImages/3.jpg"
+              type="button">
+              <span class="giftIcon">🎁</span>
+              <span class="giftLabel">Memory 3</span>
+              <span class="reveal"></span>
             </button>
 
             <button
-              class="memoryTile"
-              data-type="image"
-              data-src="assets/ourImages/4.jpg">
-              <div class="memoryCover">
-                <div class="coverIcon">🎁</div>
-                <div class="coverText">Tap to reveal</div>
-              </div>
-              <img
-                class="memoryMedia"
-                src="assets/ourImages/4.jpg"
-                alt="Memory 4" />
+              class="memoryGift"
+              data-img="./assets/ourImages/4.jpg"
+              type="button">
+              <span class="giftIcon">🎁</span>
+              <span class="giftLabel">Memory 4</span>
+              <span class="reveal"></span>
             </button>
-
             <button
-              class="memoryTile"
-              data-type="image"
-              data-src="assets/ourImages/5.jpg">
-              <div class="memoryCover">
-                <div class="coverIcon">🎁</div>
-                <div class="coverText">Tap to reveal</div>
-              </div>
-              <img
-                class="memoryMedia"
-                src="assets/ourImages/5.jpg"
-                alt="Memory 5" />
+              class="memoryGift"
+              data-img="./assets/ourImages/5.jpg"
+              type="button">
+              <span class="giftIcon">🎁</span>
+              <span class="giftLabel">Memory 5</span>
+              <span class="reveal"></span>
             </button>
-
             <button
-              class="memoryTile"
-              data-type="image"
-              data-src="assets/ourImages/6.jpg">
-              <div class="memoryCover">
-                <div class="coverIcon">🎁</div>
-                <div class="coverText">Tap to reveal</div>
-              </div>
-              <img
-                class="memoryMedia"
-                src="assets/ourImages/6.jpg"
-                alt="Memory 6" />
+              class="memoryGift"
+              data-img="./assets/ourImages/6.jpg"
+              type="button">
+              <span class="giftIcon">🎁</span>
+              <span class="giftLabel">Memory 6</span>
+              <span class="reveal"></span>
             </button>
-
             <button
-              class="memoryTile"
-              data-type="image"
-              data-src="assets/ourImages/7.jpg">
-              <div class="memoryCover">
-                <div class="coverIcon">🎁</div>
-                <div class="coverText">Tap to reveal</div>
-              </div>
-              <img
-                class="memoryMedia"
-                src="assets/ourImages/7.jpg"
-                alt="Memory 7" />
+              class="memoryGift"
+              data-img="./assets/ourImages/7.jpg"
+              type="button">
+              <span class="giftIcon">🎁</span>
+              <span class="giftLabel">Memory 7</span>
+              <span class="reveal"></span>
             </button>
-
             <button
-              class="memoryTile"
-              data-type="image"
-              data-src="assets/ourImages/8.jpg">
-              <div class="memoryCover">
-                <div class="coverIcon">🎁</div>
-                <div class="coverText">Tap to reveal</div>
-              </div>
-              <img
-                class="memoryMedia"
-                src="assets/ourImages/8.jpg"
-                alt="Memory 8" />
+              class="memoryGift"
+              data-img="./assets/ourImages/8.jpg"
+              type="button">
+              <span class="giftIcon">🎁</span>
+              <span class="giftLabel">Memory 8</span>
+              <span class="reveal"></span>
             </button>
+          </div>
+        </div>
+      </section>
 
-            <!-- Example video tile (optional) -->
-            <!--
-          <button class="memoryTile video" data-type="video" data-src="assets/ourVideos/1.mp4">
-            <div class="memoryCover">
-              <div class="coverIcon">▶</div>
-              <div class="coverText">Tap to play</div>
+      <!-- 6) Our Soundtrack -->
+      <section class="panel" id="p6" data-title="Soundtrack">
+        <div class="card">
+          <p class="kicker">our soundtrack 🎵</p>
+          <h2 class="title">Songs that feel like you</h2>
+          <p class="subtle">Cute cards • play/pause • progress bar</p>
+
+          <!-- Now Playing -->
+          <div class="nowPlaying" id="nowPlaying" hidden>
+            <div class="npTop">
+              <div class="npLabel">Now playing</div>
+              <div class="npName" id="npName">—</div>
+              <button class="btn btnGhost npBtn" id="npPlayPause" type="button">
+                Pause
+              </button>
             </div>
-            <div class="videoThumb">
-              <div class="playPulse">▶</div>
+
+            <div class="npSeekRow">
+              <div class="npTime" id="npTime">0:00</div>
+              <input
+                class="npSeek"
+                id="npSeek"
+                type="range"
+                min="0"
+                max="100"
+                value="0"
+                step="0.1" />
+              <div class="npTime" id="npDur">0:00</div>
             </div>
+          </div>
+
+          <div class="tracks" id="tracks"></div>
+
+          <div class="trackActions">
+            <button class="btn btnGhost" id="shuffleBtn" type="button">
+              Shuffle
+            </button>
+            <button class="btn btnGhost" id="stopBtn" type="button">
+              Stop
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7) Valentine Question -->
+      <section class="panel" id="p7" data-title="Question">
+        <div class="card center">
+          <img
+            class="sticker"
+            id="questionGif"
+            src="./assets/GifData/Yes/lovecutie7.gif"
+            alt="cute gif" />
+          <p class="kicker">the moment 😜❤️</p>
+          <h2 class="question">Will you be my Valentine?</h2>
+          <p class="subtle centerText">Be honest. But also… choose wisely 😌</p>
+
+          <div class="noPopup" id="noPopup" aria-hidden="true">
+            <img
+              class="noPopupGif"
+              id="noPopupGif"
+              src="./assets/GifData/No/RejectNo.gif"
+              alt="cute no gif" />
+            <div class="noPopupText" id="noPopupText">Soch lo achhe se ❤️</div>
+          </div>
+
+          <div class="btnArea" id="btnArea">
+            <button class="btn btnGlow" id="yesBtn" type="button">
+              YES ❤️
+            </button>
+            <button class="btn btnNo" id="noBtn" type="button">NO 😜</button>
+          </div>
+
+          <div class="tease" id="teaseBubble">Soch lo achhe se ❤️</div>
+          <p class="tiny">NO dabao… YES aur irresistible ho jayega 😁</p>
+        </div>
+      </section>
+
+      <!-- 8) Gifts -->
+      <section class="panel" id="p8" data-title="Gifts">
+        <div class="card center giftsCard">
+          <p class="kicker">gifts for you 🎁</p>
+          <h2 class="title centerTitle">They unlock after you say YES 😌</h2>
+
+          <div class="giftGridBig locked" id="giftRow">
+            <button class="giftCardBig" data-gift="1" type="button">
+              <span class="giftBadge">Gift 1</span>
+              <span class="giftEmoji">🎀</span>
+              <span class="giftTitle">A tiny surprise</span>
+              <span class="giftSub">tap to open</span>
+              <span class="giftLock"><span>🔒 Locked</span></span>
+            </button>
+
+            <button class="giftCardBig" data-gift="2" type="button">
+              <span class="giftBadge">Gift 2</span>
+              <span class="giftEmoji">💌</span>
+              <span class="giftTitle">A soft promise</span>
+              <span class="giftSub">tap to open</span>
+              <span class="giftLock"><span>🔒 Locked</span></span>
+            </button>
+
+            <button class="giftCardBig" data-gift="3" type="button">
+              <span class="giftBadge">Gift 3</span>
+              <span class="giftEmoji">🌙</span>
+              <span class="giftTitle">A midnight wish</span>
+              <span class="giftSub">tap to open</span>
+              <span class="giftLock"><span>🔒 Locked</span></span>
+            </button>
+          </div>
+
+          <p class="micro" id="giftLockHint">
+            Locked 🔒 (unlock by pressing YES)
+          </p>
+          <button class="btn btnGhost" id="backToTop" type="button">
+            Back to top ↑
           </button>
-          --></div>
-
-          <!-- <div class="finePrint">
-            Want videos? Uncomment the sample tile and add your mp4 in
-            <b>assets/ourVideos/</b>. -->
-          </div>
-        </div>
-      </section>
-
-      <!-- 5) Soundtrack -->
-      <section class="snap section music" data-title="Soundtrack">
-        <div class="content">
-          <h2 class="h2">Our Soundtrack 🎶</h2>
-          <p class="p">Pick a track. Let it play like a scene.</p>
-
-          <div class="playerCard">
-            <div class="playerHeader">
-              <div class="nowLabel">Now playing</div>
-              <div class="nowTitle" id="nowTitle">—</div>
-              <div class="nowMeta" id="nowMeta">—</div>
-            </div>
-
-            <div class="progressWrap">
-              <span class="time" id="curTime">0:00</span>
-              <input type="range" id="seek" min="0" max="100" value="0" />
-              <span class="time" id="durTime">0:00</span>
-            </div>
-
-            <div class="playerControls">
-              <button class="btn ghost" id="shuffleBtn">Shuffle</button>
-              <button class="btn" id="playPauseBtn">Play</button>
-              <button class="btn ghost" id="stopBtn">Stop</button>
-            </div>
-
-            <div class="trackList" id="trackList"></div>
-          </div>
-
-          <audio id="audio"></audio>
-        </div>
-      </section>
-
-      <!-- 6) Valentine Question -->
-      <section class="snap section question" data-title="Question">
-        <div class="content center">
-          <div class="tag">Final question</div>
-          <h2 class="h2 big">Will you be my Valentine? 💘</h2>
-          <p class="p">Be honest. But also… choose wisely 😌</p>
-
-          <div class="qaBox" id="qaBox">
-            <button class="yesBtn" id="yesBtn">YES 💖</button>
-            <button class="noBtn" id="noBtn">NO 🙈</button>
-          </div>
-
-          <div class="tease" id="tease">🙂</div>
-          <div class="finePrint">
-            NO button moves on click (not hover) + YES grows each NO.
-          </div>
-        </div>
-      </section>
-
-      <!-- 7) Outro -->
-      <section class="snap section outro" data-title="Outro">
-        <div class="content center">
-          <h2 class="h2">That’s it… for now.</h2>
-          <p class="p">But if it was up to me, I’d replay this forever.</p>
-          <button class="pill" id="replayBtn">Replay from top</button>
         </div>
       </section>
     </main>
 
-    <script src="script.js"></script>
+    <!-- Floating Next/Prev -->
+    <div class="navFloats">
+      <button
+        class="navBtn"
+        id="prevBtn"
+        type="button"
+        aria-label="Previous section">
+        ↑
+      </button>
+      <button
+        class="navBtn"
+        id="nextBtn"
+        type="button"
+        aria-label="Next section">
+        ↓
+      </button>
+    </div>
+
+    <!-- Modal -->
+    <div
+      class="overlay"
+      id="overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle">
+      <div class="modal">
+        <img
+          class="sticker sm"
+          id="modalGif"
+          src="./assets/GifData/Yes/love1.gif"
+          alt="cute gif" />
+        <p class="kicker" id="modalKicker">gift</p>
+        <h3 id="modalTitle">Gift</h3>
+        <p class="modalText" id="modalText">...</p>
+
+        <div class="mini">
+          <button class="btn btnGlow" id="closeBtn" type="button">
+            Aww ❤️
+          </button>
+          <button class="btn btnGhost" id="modalMusicBtn" type="button">
+            Play Love Music 🎶
+          </button>
+        </div>
+
+        <p class="micro">(Edit gift text in script.js)</p>
+      </div>
+    </div>
+    <!-- NO Modal (full popup) -->
+    <div class="noOverlay" id="noOverlay" aria-hidden="true">
+      <div class="noModal" role="dialog" aria-modal="true">
+        <img
+          class="noModalGif"
+          id="noModalGif"
+          src="./assets/GifData/No/RejectNo.gif"
+          alt="no gif" />
+        <h3 class="noModalTitle" id="noModalTitle">Areee… NO? 😭</h3>
+        <p class="noModalText" id="noModalText">Soch lo achhe se ❤️</p>
+
+        <div class="noModalActions">
+          <button class="btn btnGlow" id="noModalOk" type="button">
+            Okay 😅
+          </button>
+          <button class="btn btnGhost" id="noModalYes" type="button">
+            Fine… YES ❤️
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <audio id="player" preload="auto"></audio>
+    <script src="./script.js"></script>
   </body>
 </html>

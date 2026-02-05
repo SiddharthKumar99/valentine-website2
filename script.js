@@ -1,452 +1,635 @@
-// ====== State ======
-const reel = document.getElementById("reel");
-const sections = Array.from(document.querySelectorAll(".snap"));
+/* =====================================================
+   Final Scroll Valentine (Divya)
+   - Scroll-snap flow + prev/next floating controls
+   - Progress dots (IntersectionObserver)
+   - Envelope v2 open/close
+   - Memories: gift -> fade reveal
+   - Soundtrack: track cards + play/pause + progress + shuffle/stop
+   - Question: NO random move + tease text, YES grows & unlock gifts
+   - Gift section: locked until YES, modal gifts
+===================================================== */
+
+const story = document.getElementById("story");
+const panels = Array.from(document.querySelectorAll(".panel"));
+const dotsEl = document.getElementById("dots");
 
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
-const navDots = document.getElementById("navDots");
 
-const startBtn = document.getElementById("startBtn");
-const replayBtn = document.getElementById("replayBtn");
+const player = document.getElementById("player");
+const musicToggle = document.getElementById("musicToggle");
 
-const envelope = document.getElementById("envelope");
-
-const giftGrid = document.getElementById("giftGrid");
-const modal = document.getElementById("modal");
-const modalBody = document.getElementById("modalBody");
-const modalClose = document.getElementById("modalClose");
+const envelopeBtn = document.getElementById("envelopeBtn");
 
 const memoryGrid = document.getElementById("memoryGrid");
 
-const yesBtn = document.getElementById("yesBtn");
-const noBtn = document.getElementById("noBtn");
-const tease = document.getElementById("tease");
-const qaBox = document.getElementById("qaBox");
-
-const celebrate = document.getElementById("celebrate");
-const heartsLayer = document.getElementById("heartsLayer");
-
-// Music
-const audio = document.getElementById("audio");
-const trackList = document.getElementById("trackList");
-const nowTitle = document.getElementById("nowTitle");
-const nowMeta = document.getElementById("nowMeta");
-const playPauseBtn = document.getElementById("playPauseBtn");
+const tracksWrap = document.getElementById("tracks");
 const shuffleBtn = document.getElementById("shuffleBtn");
 const stopBtn = document.getElementById("stopBtn");
-const seek = document.getElementById("seek");
-const curTime = document.getElementById("curTime");
-const durTime = document.getElementById("durTime");
 
-let currentIndex = 0;
-let noClicks = 0;
-let yesScale = 1;
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const btnArea = document.getElementById("btnArea");
+const teaseBubble = document.getElementById("teaseBubble");
+const questionGif = document.getElementById("questionGif");
+const noPopup = document.getElementById("noPopup");
+const noPopupGif = document.getElementById("noPopupGif");
+const noPopupText = document.getElementById("noPopupText");
 
-// YES unlock persisted
-const STORAGE_KEY = "divya_valentine_yes";
-const MUSIC_KEY = "divya_valentine_last_track";
+const giftRow = document.getElementById("giftRow");
+const giftLockHint = document.getElementById("giftLockHint");
+const backToTop = document.getElementById("backToTop");
 
-// Update these manually
-const tracks = [
-  { title: "Aise Kyun", artist: "Me ✨", src: "assets/AudioTracks/Aise_Kyun.webm" },
-  { title: "Darkhaast", artist: "Us ❤️", src: "assets/AudioTracks/DARKHAAST.webm" },
-  { title: "Dooron Dooron", artist: "Again & Again", src: "assets/AudioTracks/Dooron_Dooron.mp4" },
-  { title: "Finding Her", artist: "Us ✨", src: "assets/AudioTracks/Finding_Her.webm" },
-  { title: "Tera Ban Jaaunga", artist: "Divya ❤️", src: "assets/AudioTracks/tera ban jaaunga.m4a" },
-  { title: "O Soniye", artist: "Again & Again", src: "assets/AudioTracks/O_Soniye.m4a" },
-  { title: "Jo Tum Mere Ho", artist: "Us ✨", src: "assets/AudioTracks/jo tum mere ho.mp3" },
-  { title: "Tum Jo Aaye", artist: "Divya ❤️", src: "assets/AudioTracks/tum jo aaye.m4a" },
-  { title: "Sang Rahiyo", artist: "Again & Again", src: "assets/AudioTracks/Sang_Rahiyo.webm" },
-  { title: "Perfect", artist: "It's You 😊", src: "assets/AudioTracks/perfect.mp3" },
-];
+const overlay = document.getElementById("overlay");
+const closeBtn = document.getElementById("closeBtn");
+const modalMusicBtn = document.getElementById("modalMusicBtn");
+const modalGif = document.getElementById("modalGif");
+const modalKicker = document.getElementById("modalKicker");
+const modalTitle = document.getElementById("modalTitle");
+const modalText = document.getElementById("modalText");
 
-// Gift content
-const gifts = {
-  1: { title: "Gift 1 — A tiny surprise", text: "A promise: I’ll always find my way back to you. 💗" },
-  2: { title: "Gift 2 — A soft promise", text: "No matter what, I choose you again and again. 🫶" },
-  3: { title: "Gift 3 — A midnight wish", text: "Meet me in the quiet moments — they’re ours. 🌙" },
+const nowPlaying = document.getElementById("nowPlaying");
+const npName = document.getElementById("npName");
+const npPlayPause = document.getElementById("npPlayPause");
+const npSeek = document.getElementById("npSeek");
+const npTime = document.getElementById("npTime");
+const npDur = document.getElementById("npDur");
+
+const noOverlay = document.getElementById("noOverlay");
+const noModalGif = document.getElementById("noModalGif");
+const noModalTitle = document.getElementById("noModalTitle");
+const noModalText = document.getElementById("noModalText");
+const noModalOk = document.getElementById("noModalOk");
+const noModalYes = document.getElementById("noModalYes");
+
+/* Helpers add (format time) */
+function fmtTime(s) {
+  if (!isFinite(s) || s < 0) return "0:00";
+  const m = Math.floor(s / 60);
+  const r = Math.floor(s % 60);
+  return `${m}:${String(r).padStart(2, "0")}`;
+}
+
+
+/* ---------- Helpers ---------- */
+function clamp(n, min, max) { return Math.max(min, Math.min(n, max)); }
+function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function scrollToPanel(index) {
+  const el = panels[clamp(index, 0, panels.length - 1)];
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ---------- Progress dots ---------- */
+let activeIndex = 0;
+
+function renderDots() {
+  dotsEl.innerHTML = "";
+  panels.forEach((_, i) => {
+    const d = document.createElement("span");
+    d.className = "dotp" + (i === activeIndex ? " active" : "");
+    dotsEl.appendChild(d);
+  });
+}
+
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (e.isIntersecting) {
+      activeIndex = panels.indexOf(e.target);
+      renderDots();
+    }
+  });
+}, { root: story, threshold: 0.6 });
+
+panels.forEach(p => io.observe(p));
+renderDots();
+
+/* ---------- Prev/Next ---------- */
+prevBtn.addEventListener("click", () => scrollToPanel(activeIndex - 1));
+nextBtn.addEventListener("click", () => scrollToPanel(activeIndex + 1));
+
+/* ---------- Music toggle ---------- */
+let musicEnabled = false;
+
+musicToggle.addEventListener("click", () => {
+  musicEnabled = !musicEnabled;
+  musicToggle.textContent = musicEnabled ? "⏸" : "♪";
+  if (!musicEnabled) player.pause();
+});
+
+/* ---------- Buckets (for YES/NO mood) ---------- */
+const buckets = {
+  love: [
+    "assets/AudioTracks/O_Soniye.m4a",
+    "assets/AudioTracks/Sang_Rahiyo.webm",
+    "assets/AudioTracks/tera ban jaaunga.m4a",
+    "assets/AudioTracks/tum jo aaye.m4a",
+    "assets/AudioTracks/perfect.mp3",
+    "assets/AudioTracks/Finding_Her.webm",
+  ],
+  rejection: [
+    "assets/AudioTracks/Aise_Kyun.webm",
+    "assets/AudioTracks/DARKHAAST.webm",
+    "assets/AudioTracks/Dooron_Dooron.mp4",
+    "assets/AudioTracks/Shiddat_Title.webm",
+  ]
 };
 
-// ====== Helpers ======
-function scrollToSection(idx) {
-  const clamped = Math.max(0, Math.min(sections.length - 1, idx));
-  sections[clamped].scrollIntoView({ behavior: "smooth", block: "start" });
+function playTrack(url) {
+  player.src = url;
+  player.currentTime = 0;
+  player.play().catch(() => { });
 }
 
-function formatTime(t) {
-  if (!isFinite(t)) return "0:00";
-  const m = Math.floor(t / 60);
-  const s = Math.floor(t % 60).toString().padStart(2, "0");
-  return `${m}:${s}`;
-}
+/* ---------- Secret envelope ---------- */
+envelopeBtn.addEventListener("click", () => {
+  envelopeBtn.classList.toggle("open");
+});
 
-function openModal(html) {
-  modalBody.innerHTML = html;
-  modal.classList.add("show");
-  modal.setAttribute("aria-hidden", "false");
-}
+/* ---------- Memories reveal ---------- */
+if (memoryGrid) {
+  memoryGrid.querySelectorAll(".memoryGift").forEach((btn) => {
+    const reveal = btn.querySelector(".reveal");
+    reveal.style.backgroundImage = `url('${btn.dataset.img}')`;
 
-function closeModal() {
-  modal.classList.remove("show");
-  modal.setAttribute("aria-hidden", "true");
-  modalBody.innerHTML = "";
-}
-
-// ====== Nav Dots ======
-function buildDots() {
-  navDots.innerHTML = "";
-  sections.forEach((s, i) => {
-    const d = document.createElement("div");
-    d.className = "dot" + (i === 0 ? " active" : "");
-    d.title = s.dataset.title || `Section ${i + 1}`;
-    navDots.appendChild(d);
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("revealed");
+    });
   });
 }
-function setActiveDot(i) {
-  const dots = Array.from(navDots.children);
-  dots.forEach((d, idx) => d.classList.toggle("active", idx === i));
-}
 
-buildDots();
-
-// Observe visible section
-const io = new IntersectionObserver(
-  (entries) => {
-    // pick most visible
-    const visible = entries
-      .filter((e) => e.isIntersecting)
-      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
-    if (!visible) return;
-    const idx = sections.indexOf(visible.target);
-    if (idx !== -1) {
-      currentIndex = idx;
-      setActiveDot(idx);
-    }
-  },
-  { root: reel, threshold: [0.35, 0.55, 0.75] }
-);
-
-sections.forEach((s) => io.observe(s));
-
-// Buttons
-prevBtn.addEventListener("click", () => scrollToSection(currentIndex - 1));
-nextBtn.addEventListener("click", () => scrollToSection(currentIndex + 1));
-
-startBtn?.addEventListener("click", () => scrollToSection(1));
-replayBtn?.addEventListener("click", () => scrollToSection(0));
-
-// ====== Envelope v2 ======
-envelope?.addEventListener("click", () => {
-  envelope.classList.toggle("open");
-});
-
-// ====== Gifts lock/unlock ======
-function setGiftsLocked(locked) {
-  const cards = Array.from(document.querySelectorAll(".giftCard"));
-  cards.forEach((c) => c.classList.toggle("locked", locked));
-}
-
-function hasYes() {
-  return localStorage.getItem(STORAGE_KEY) === "1";
-}
-
-function unlockAll() {
-  localStorage.setItem(STORAGE_KEY, "1");
-  setGiftsLocked(false);
-}
-
-setGiftsLocked(!hasYes());
-
-giftGrid?.addEventListener("click", (e) => {
-  const card = e.target.closest(".giftCard");
-  if (!card) return;
-
-  if (card.classList.contains("locked")) {
-    openModal(`
-      <h3 class="modalTitle">Locked 😌</h3>
-      <p class="modalText">First answer the final question with <b>YES</b> 💖</p>
-    `);
-    return;
-  }
-
-  const id = card.dataset.gift;
-  const g = gifts[id];
-  openModal(`
-    <h3 class="modalTitle">${g.title}</h3>
-    <p class="modalText">${g.text}</p>
-    <img src="assets/ourImages/${Math.min(Number(id), 4)}.jpg" alt="gift image" />
-  `);
-});
-
-// ====== Memories reveal + video support ======
-memoryGrid?.addEventListener("click", (e) => {
-  const tile = e.target.closest(".memoryTile");
-  if (!tile) return;
-
-  const type = tile.dataset.type || "image";
-  const src = tile.dataset.src;
-
-  // Images do blur->clear reveal
-  if (type === "image") {
-    tile.classList.toggle("revealed");
-    return;
-  }
-
-  // Videos open in modal
-  if (type === "video") {
-    openModal(`
-      <h3 class="modalTitle">Memory ▶</h3>
-      <p class="modalText">Press play… and don’t blink 💗</p>
-      <video src="${src}" controls playsinline></video>
-    `);
-  }
-});
-
-// ====== Modal close ======
-modalClose?.addEventListener("click", closeModal);
-modal?.addEventListener("click", (e) => {
-  if (e.target === modal) closeModal();
-});
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeModal();
-});
-
-// ====== Valentine YES/NO ======
-const noTeases = [
-  "Soch lo… 😌",
-  "Are you sure? 🙈",
-  "Itna bhi bhaav nahi… 😭",
-  "Okay… but YES is cuter 💖",
-  "Last chance 😏",
-  "Divya plsss 🥺",
+/* =====================================================
+   OUR SOUNDTRACK
+   Add more tracks here ✅
+===================================================== */
+const soundtrack = [
+  // Optional: add cover image like cover: "./assets/TrackCovers/perfect.jpg"
+  { name: "Darkhaast ❤️", file: "assets/AudioTracks/DARKHAAST.webm", cover: "assets/musicTrack Cover/darkhaast.png" },
+  { name: "Dooron Dooron 💞", file: "assets/AudioTracks/Dooron_Dooron.mp4", cover: "assets/musicTrack Cover/DooronDooron.png" },
+  { name: "Jo Tum Mere Ho 😊", file: "assets/AudioTracks/jo tum mere ho.mp3", cover: "assets/musicTrack Cover/joTumMereHo.png" },
+  { name: "O Soniye 🥰", file: "assets/AudioTracks/O_Soniye.m4a", cover: "assets/musicTrack Cover/O-soniye.png" },
+  { name: "Tera Ban Jaaunga 😉", file: "assets/AudioTracks/tera ban jaaunga.m4a", cover: "assets/musicTrack Cover/teraBanJaaunga.png" },
+  { name: "Sang Rahiyo 😚", file: "assets/AudioTracks/Sang_Rahiyo.webm", cover: "assets/musicTrack Cover/sangRahiyo.png" },
+  { name: "Finding Her ", file: "assets/AudioTracks/Finding_Her.webm", cover: "assets/musicTrack Cover/findingHer.png" },
+  { name: "Perfect", file: "assets/AudioTracks/perfect.mp3", cover: "assets/musicTrack Cover/perfect.png" },
 ];
 
-function moveNoButton() {
-  const box = qaBox.getBoundingClientRect();
-  const btn = noBtn.getBoundingClientRect();
+let currentProgress = null;
 
-  const padding = 12;
-  const maxX = box.width - btn.width - padding;
-  const maxY = box.height - btn.height - padding;
+function buildTrackCards() {
+  tracksWrap.innerHTML = "";
 
-  const x = Math.max(padding, Math.random() * maxX);
-  const y = Math.max(padding, Math.random() * maxY);
+  soundtrack.forEach((t) => {
+    const card = document.createElement("div");
+    card.className = "trackCard";
 
-  noBtn.style.left = `${x}px`;
-  noBtn.style.top = `${y}px`;
-  noBtn.style.right = "auto";
-  noBtn.style.bottom = "auto";
-}
+    const left = document.createElement("div");
+    left.className = "trackLeft";
 
-function growYes() {
-  yesScale = Math.min(1.55, yesScale + 0.08);
-  yesBtn.style.transform = `scale(${yesScale})`;
-  yesBtn.classList.remove("pop");
-  void yesBtn.offsetWidth;
-  yesBtn.classList.add("pop");
-}
+    let icon;
+    if (t.cover) {
+      icon = document.createElement("div");
+      icon.className = "trackCover";
+      const im = document.createElement("img");
+      im.src = t.cover;
+      im.alt = t.name;
+      icon.appendChild(im);
+    } else {
+      icon = document.createElement("div");
+      icon.className = "trackIcon";
+      icon.textContent = "♪";
+    }
 
-noBtn?.addEventListener("click", () => {
-  noClicks++;
-  moveNoButton();
-  growYes();
-  tease.textContent = noTeases[Math.min(noClicks - 1, noTeases.length - 1)];
-});
+    const meta = document.createElement("div");
+    meta.className = "trackMeta";
 
-function spawnHeartsBurst(count = 22) {
-  heartsLayer.classList.add("show");
+    const name = document.createElement("div");
+    name.className = "trackName";
+    name.textContent = t.name;
 
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+    const sub = document.createElement("div");
+    sub.className = "trackSub";
+    sub.textContent = "Tap play • cute vibe";
 
-  for (let i = 0; i < count; i++) {
-    const el = document.createElement("div");
-    el.className = "heart";
-    el.textContent = Math.random() > 0.5 ? "💖" : "💗";
-    el.style.left = `${Math.random() * (w - 40) + 20}px`;
-    el.style.top = `${h - 80}px`;
-    el.style.fontSize = `${Math.random() * 14 + 14}px`;
-    el.style.animationDuration = `${Math.random() * 1.2 + 2.2}s`;
-    el.style.animationDelay = `${Math.random() * 0.25}s`;
-    heartsLayer.appendChild(el);
+    const prog = document.createElement("div");
+    prog.className = "progress";
+    const bar = document.createElement("span");
+    prog.appendChild(bar);
 
-    el.addEventListener("animationend", () => el.remove());
-  }
+    meta.appendChild(name);
+    meta.appendChild(sub);
+    meta.appendChild(prog);
 
-  // auto hide layer after a moment
-  setTimeout(() => {
-    if (!document.querySelector(".heart")) heartsLayer.classList.remove("show");
-  }, 3200);
-}
+    left.appendChild(icon);
+    left.appendChild(meta);
 
-function showCelebrate() {
-  celebrate.classList.add("show");
-  celebrate.setAttribute("aria-hidden", "false");
-  setTimeout(() => {
-    celebrate.classList.remove("show");
-    celebrate.setAttribute("aria-hidden", "true");
-  }, 1800);
-}
+    const btn = document.createElement("button");
+    btn.className = "btn btnGhost";
+    btn.textContent = "Play";
 
-function autoplayAfterYes() {
-  // If nothing selected yet, pick 0
-  let idx = Number(localStorage.getItem(MUSIC_KEY) || "0");
-  if (!tracks[idx]) idx = 0;
-  loadTrack(idx, true);
-}
+    btn.addEventListener("click", () => {
+      // pause same
+      if (player.src.includes(t.file) && !player.paused) {
+        player.pause();
+        btn.textContent = "Play";
+        currentProgress = null;
+        return;
+      }
 
-yesBtn?.addEventListener("click", () => {
-  unlockAll();
-  tease.textContent = "I KNEW IT 💖💖💖";
-  spawnHeartsBurst(28);
-  showCelebrate();
-  autoplayAfterYes();
+      // reset all
+      document.querySelectorAll(".trackCard .btn").forEach(b => b.textContent = "Play");
 
-  // Cute auto scroll to gifts after yes
-  setTimeout(() => scrollToSection(2), 700);
-});
+      // play selected
+      playTrack(t.file);
+      musicEnabled = true;
+      musicToggle.textContent = "⏸";
+      btn.textContent = "Pause";
+      currentProgress = bar;
 
-// ====== Music Player (track list UI) ======
-let currentTrack = 0;
-let isPlaying = false;
 
-function renderTrackList() {
-  trackList.innerHTML = "";
-  tracks.forEach((t, i) => {
-    const row = document.createElement("div");
-    row.className = "trackRow" + (i === currentTrack ? " active" : "");
-    row.innerHTML = `
-      <div class="trackLeft">
-        <button class="trackPlay" data-i="${i}" aria-label="Play ${t.title}">
-          ${i === currentTrack && isPlaying ? "❚❚" : "▶"}
-        </button>
-        <div class="trackInfo">
-          <div class="trackName">${t.title}</div>
-          <div class="trackArtist">${t.artist}</div>
-        </div>
-      </div>
-      <div class="trackRight">${i === currentTrack && isPlaying ? "playing" : ""}</div>
-    `;
-    trackList.appendChild(row);
+      // Now Playing UI
+      if (nowPlaying) nowPlaying.hidden = false;
+      if (npName) npName.textContent = t.name;
+      if (npPlayPause) npPlayPause.textContent = "Pause";
+    });
+
+    card.appendChild(left);
+    card.appendChild(btn);
+    tracksWrap.appendChild(card);
   });
 }
 
-function setNowPlaying(i) {
-  nowTitle.textContent = tracks[i]?.title || "—";
-  nowMeta.textContent = tracks[i]?.artist || "—";
+buildTrackCards();
+
+let isSeeking = false;
+
+if (npPlayPause) {
+  npPlayPause.addEventListener("click", () => {
+    if (!player.src) return;
+    if (player.paused) {
+      player.play().catch(() => { });
+      npPlayPause.textContent = "Pause";
+    } else {
+      player.pause();
+      npPlayPause.textContent = "Play";
+    }
+  });
 }
 
-function loadTrack(i, autoplay = false) {
-  currentTrack = i;
-  localStorage.setItem(MUSIC_KEY, String(i));
+if (npSeek) {
+  npSeek.addEventListener("input", () => {
+    if (!player.duration) return;
+    isSeeking = true;
+    player.currentTime = Number(npSeek.value);
+    if (npTime) npTime.textContent = fmtTime(player.currentTime);
+  });
 
-  audio.src = tracks[i].src;
-  setNowPlaying(i);
+  npSeek.addEventListener("change", () => {
+    isSeeking = false;
+  });
+}
 
-  // reset UI
-  seek.value = 0;
-  curTime.textContent = "0:00";
-  durTime.textContent = "0:00";
+player.addEventListener("loadedmetadata", () => {
+  if (!npSeek) return;
+  npSeek.max = String(player.duration || 0);
+  npSeek.value = String(player.currentTime || 0);
+  if (npDur) npDur.textContent = fmtTime(player.duration);
+});
 
-  audio.load();
+player.addEventListener("timeupdate", () => {
+  // existing progress bar update stays as-is
+  if (!player.duration) return;
 
-  if (autoplay) {
-    audio.play().then(() => {
-      isPlaying = true;
-      playPauseBtn.textContent = "Pause";
-      renderTrackList();
-    }).catch(() => {
-      // autoplay blocked (shouldn't happen because YES click is user gesture)
-      isPlaying = false;
-      playPauseBtn.textContent = "Play";
-      renderTrackList();
-    });
-  } else {
-    isPlaying = false;
-    playPauseBtn.textContent = "Play";
-    renderTrackList();
+  if (!isSeeking && npSeek) {
+    npSeek.value = String(player.currentTime);
+  }
+  if (npTime) npTime.textContent = fmtTime(player.currentTime);
+  if (npDur) npDur.textContent = fmtTime(player.duration);
+});
+
+
+player.addEventListener("timeupdate", () => {
+  if (!currentProgress || !player.duration) return;
+  const pct = (player.currentTime / player.duration) * 100;
+  currentProgress.style.width = `${pct}%`;
+});
+
+shuffleBtn.addEventListener("click", () => {
+  const t = pickRandom(soundtrack);
+  document.querySelectorAll(".trackCard .btn").forEach(b => b.textContent = "Play");
+  playTrack(t.file);
+  musicEnabled = true;
+  musicToggle.textContent = "⏸";
+
+  if (nowPlaying) nowPlaying.hidden = false;
+  if (npName) npName.textContent = t.name;
+  if (npPlayPause) npPlayPause.textContent = "Pause";
+  // progress bar will attach when a card is pressed; we keep it simple here
+});
+
+stopBtn.addEventListener("click", () => {
+  player.pause();
+  player.currentTime = 0;
+  document.querySelectorAll(".trackCard .btn").forEach(b => b.textContent = "Play");
+  currentProgress = null;
+
+  if (npPlayPause) npPlayPause.textContent = "Play";
+  if (npSeek) npSeek.value = "0";
+  if (npTime) npTime.textContent = "0:00";
+
+});
+
+/* =====================================================
+   YES/NO DRAMA
+===================================================== */
+const teaseLines = [
+  "Soch lo achhe se ❤️",
+  "Are you sure? 😏",
+  "NO thoda mushkil option hai 😜",
+  "Ek aur chance? 🥺",
+  "Divya… please? 😌",
+  "YES wala button cute lag raha hai na? 😄"
+];
+
+const gifs = {
+  yes: [
+    "./assets/GifData/Yes/love1.gif",
+    "./assets/GifData/Yes/love2.gif",
+    "./assets/GifData/Yes/love3.gif",
+    "./assets/GifData/Yes/lovecutie7.gif",
+    "./assets/GifData/Yes/lovecutie9.gif"
+  ],
+  no: [
+    "./assets/GifData/No/RejectNo.gif",
+    "./assets/GifData/No/breakRej1.gif",
+    "./assets/GifData/No/breakRej4.gif",
+    "./assets/GifData/No/breakRej7.gif"
+  ]
+};
+
+let teaseIndex = 0;
+let yesScale = 1;
+let unlocked = false;
+
+function showTease(msg) {
+  teaseBubble.textContent = msg;
+  teaseBubble.classList.add("show");
+  clearTimeout(showTease._t);
+  showTease._t = setTimeout(() => teaseBubble.classList.remove("show"), 1100);
+}
+
+
+function showNoPopup(msg) {
+  if (!noPopup) return;
+  noPopupText.textContent = msg;
+  if (noPopupGif) noPopupGif.src = pickRandom(gifs.no);
+
+  noPopup.classList.add("show");
+  noPopup.setAttribute("aria-hidden", "false");
+
+  clearTimeout(showNoPopup._t);
+  showNoPopup._t = setTimeout(() => {
+    noPopup.classList.remove("show");
+    noPopup.setAttribute("aria-hidden", "true");
+  }, 1400);
+}
+
+// function moveNoRandom() {
+//   const areaRect = btnArea.getBoundingClientRect();
+//   const btnRect = noBtn.getBoundingClientRect();
+//   const pad = 6;
+
+//   const maxX = areaRect.width - btnRect.width - pad * 2;
+//   const maxY = areaRect.height - btnRect.height - pad * 2;
+
+//   const x = pad + Math.random() * Math.max(0, maxX);
+//   const y = pad + Math.random() * Math.max(0, maxY);
+
+//   noBtn.style.left = `${x}px`;
+//   noBtn.style.top = `${y}px`;
+//   noBtn.style.transform = "translateX(0)";
+
+//   noBtn.animate(
+//     [{ transform: "scale(1)" }, { transform: "scale(1.06)" }, { transform: "scale(1)" }],
+//     { duration: 260, easing: "ease-out" }
+//   );
+// }
+function moveNoRandom() {
+  const areaRect = btnArea.getBoundingClientRect();
+  const btnRect = noBtn.getBoundingClientRect();
+
+  const pad = 10;
+
+  // Keep movement tighter (top-right region), so it doesn't fly too much
+  const regionW = areaRect.width * 0.55;
+  const regionH = areaRect.height * 0.45;
+
+  const maxX = Math.max(pad, regionW - btnRect.width - pad);
+  const maxY = Math.max(pad, regionH - btnRect.height - pad);
+
+  const x = areaRect.width - regionW + (pad + Math.random() * (maxX - pad));
+  const y = pad + Math.random() * (maxY - pad);
+
+  noBtn.style.right = "auto";
+  noBtn.style.left = `${x}px`;
+  noBtn.style.top = `${y}px`;
+
+  noBtn.animate(
+    [{ transform: "scale(1)" }, { transform: "scale(1.04)" }, { transform: "scale(1)" }],
+    { duration: 240, easing: "ease-out" }
+  );
+}
+
+
+
+// function makeYesBigger() {
+//   yesScale = clamp(yesScale + 0.07, 1, 1.55);
+//   yesBtn.style.setProperty("--ys", yesScale.toString());
+
+//   // cute pop
+//   yesBtn.animate(
+//     [
+//       { transform: `scale(${yesScale})` },
+//       { transform: `scale(${Math.min(yesScale + 0.08, 1.65)})` },
+//       { transform: `scale(${yesScale})` }
+//     ],
+//     { duration: 320, easing: "cubic-bezier(.2,.9,.2,1)" }
+//   );
+
+//   const glow = clamp(0.22 + (yesScale - 1) * 0.6, 0.22, 0.55);
+//   yesBtn.style.boxShadow = `0 0 0 1px rgba(255,255,255,0.45), 0 30px 80px rgba(255,61,127,${glow})`;
+// }
+function makeYesBigger() {
+  yesScale = clamp(yesScale + 0.10, 1, 1.70);
+  yesBtn.style.setProperty("--ys", yesScale.toString());
+
+  yesBtn.animate(
+    [
+      { transform: `scale(${yesScale})` },
+      { transform: `scale(${Math.min(yesScale + 0.10, 1.80)})` },
+      { transform: `scale(${yesScale})` }
+    ],
+    { duration: 260, easing: "cubic-bezier(.2,.9,.2,1)" }
+  );
+}
+
+
+
+noBtn.addEventListener("click", () => {
+  const msg = teaseLines[teaseIndex % teaseLines.length];
+  showTease(msg);
+  showNoPopup(msg);
+  teaseIndex++;
+  showNoModal(msg);
+
+
+  makeYesBigger();
+  moveNoRandom();
+  questionGif.src = pickRandom(gifs.no);
+
+  if (musicEnabled) playTrack(pickRandom(buckets.rejection));
+});
+function showNoModal(msg) {
+  if (!noOverlay) return;
+
+  if (noModalGif) noModalGif.src = pickRandom(gifs.no);
+  if (noModalText) noModalText.textContent = msg;
+
+  // eye-catch title rotate
+  if (noModalTitle) {
+    noModalTitle.textContent = pickRandom([
+      "Areee… NO? 😭",
+      "NO nahi chalega 😜",
+      "Ek aur baar soch lo 🥺"
+    ]);
+  }
+
+  noOverlay.classList.add("show");
+  noOverlay.setAttribute("aria-hidden", "false");
+}
+
+function hideNoModal() {
+  if (!noOverlay) return;
+  noOverlay.classList.remove("show");
+  noOverlay.setAttribute("aria-hidden", "true");
+}
+
+if (noModalOk) noModalOk.addEventListener("click", hideNoModal);
+if (noOverlay) noOverlay.addEventListener("click", (e) => { if (e.target === noOverlay) hideNoModal(); });
+
+if (noModalYes) {
+  noModalYes.addEventListener("click", () => {
+    hideNoModal();
+    yesBtn.click(); // direct YES
+  });
+}
+
+
+// Make NO harder to click on desktop: it dodges when cursor comes close
+let lastDodge = 0;
+function dodgeIfClose(clientX, clientY) {
+  const now = performance.now();
+  if (now - lastDodge < 240) return;
+
+  const r = noBtn.getBoundingClientRect();
+  const cx = r.left + r.width / 2;
+  const cy = r.top + r.height / 2;
+
+  const dx = clientX - cx;
+  const dy = clientY - cy;
+  const dist = Math.hypot(dx, dy);
+
+  if (dist < 90) {
+    lastDodge = now;
+    moveNoRandom();
   }
 }
 
-function togglePlay() {
-  if (!audio.src) loadTrack(currentTrack, false);
+if (btnArea) {
+  btnArea.addEventListener("mousemove", (e) => dodgeIfClose(e.clientX, e.clientY));
+  noBtn.addEventListener("mouseenter", () => moveNoRandom());
+}
 
-  if (isPlaying) {
-    audio.pause();
-    isPlaying = false;
-    playPauseBtn.textContent = "Play";
-  } else {
-    audio.play().then(() => {
-      isPlaying = true;
-      playPauseBtn.textContent = "Pause";
-    }).catch(() => {
-      isPlaying = false;
-      playPauseBtn.textContent = "Play";
-    });
+
+/* ---------- Gifts lock/unlock ---------- */
+function unlockGifts() {
+  unlocked = true;
+  giftRow.classList.remove("locked");
+  giftLockHint.textContent = "Unlocked ✅";
+  giftLockHint.style.color = "rgba(42,27,34,0.75)";
+}
+
+yesBtn.addEventListener("click", () => {
+  questionGif.src = pickRandom(gifs.yes);
+
+  musicEnabled = true;
+  musicToggle.textContent = "⏸";
+  playTrack(pickRandom(buckets.love));
+
+  unlockGifts();
+
+  setTimeout(() => {
+    document.getElementById("p8").scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 350);
+});
+
+/* ---------- Gift modal content ---------- */
+const giftContent = {
+  1: {
+    title: "Gift 1",
+    text: "A small promise: I’ll keep choosing you — softly, daily. ❤️",
+    gif: "./assets/GifData/Yes/lovecutie2.gif"
+  },
+  2: {
+    title: "Gift 2",
+    text: "A cute reminder: you’re my peace. My favorite feeling. 🥺",
+    gif: "./assets/GifData/Yes/lovecutie6.gif"
+  },
+  3: {
+    title: "Gift 3",
+    text: "A dramatic line: I don’t want perfect… I want YOU. 💝",
+    gif: "./assets/GifData/Yes/lovecutie9.gif"
   }
-  renderTrackList();
+};
+
+document.querySelectorAll(".giftCardBig").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (!unlocked) return;
+    const id = btn.dataset.gift;
+    const g = giftContent[id];
+
+    modalKicker.textContent = "something for you";
+    modalTitle.textContent = g.title;
+    modalText.textContent = g.text;
+    modalGif.src = g.gif;
+
+    overlay.classList.add("show");
+  });
+});
+
+closeBtn.addEventListener("click", () => overlay.classList.remove("show"));
+overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.remove("show"); });
+
+modalMusicBtn.addEventListener("click", () => {
+  musicEnabled = true;
+  musicToggle.textContent = "⏸";
+  playTrack(pickRandom(buckets.love));
+});
+
+/* ---------- Back to top ---------- */
+backToTop.addEventListener("click", () => {
+  document.getElementById("p1").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+/* ---------- NO default position reset on resize ---------- */
+
+function resetNo() {
+  noBtn.style.left = "auto";
+  noBtn.style.bottom = "auto";
+  noBtn.style.right = "26%";
+  noBtn.style.top = "22px";
+  noBtn.style.transform = "none";
 }
 
-function stopMusic() {
-  audio.pause();
-  audio.currentTime = 0;
-  isPlaying = false;
-  playPauseBtn.textContent = "Play";
-  renderTrackList();
-}
-
-function shufflePlay() {
-  const i = Math.floor(Math.random() * tracks.length);
-  loadTrack(i, true);
-}
-
-trackList?.addEventListener("click", (e) => {
-  const btn = e.target.closest(".trackPlay");
-  if (!btn) return;
-  const i = Number(btn.dataset.i);
-
-  if (i === currentTrack) {
-    togglePlay();
-    return;
-  }
-  loadTrack(i, true);
-});
-
-playPauseBtn?.addEventListener("click", togglePlay);
-stopBtn?.addEventListener("click", stopMusic);
-shuffleBtn?.addEventListener("click", shufflePlay);
-
-audio.addEventListener("loadedmetadata", () => {
-  durTime.textContent = formatTime(audio.duration);
-});
-audio.addEventListener("timeupdate", () => {
-  if (!isFinite(audio.duration) || audio.duration === 0) return;
-  const p = (audio.currentTime / audio.duration) * 100;
-  seek.value = String(Math.floor(p));
-  curTime.textContent = formatTime(audio.currentTime);
-});
-audio.addEventListener("ended", () => {
-  isPlaying = false;
-  playPauseBtn.textContent = "Play";
-  renderTrackList();
-});
-
-seek.addEventListener("input", () => {
-  if (!isFinite(audio.duration) || audio.duration === 0) return;
-  const p = Number(seek.value) / 100;
-  audio.currentTime = audio.duration * p;
-});
-
-// init
-(function init() {
-  // Load last selected track
-  let idx = Number(localStorage.getItem(MUSIC_KEY) || "0");
-  if (!tracks[idx]) idx = 0;
-  loadTrack(idx, false);
-
-  // If already YES, keep gifts unlocked
-  if (hasYes()) setGiftsLocked(false);
-
-  renderTrackList();
-})();
+window.addEventListener("load", resetNo);
+window.addEventListener("resize", resetNo);
