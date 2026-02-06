@@ -156,12 +156,14 @@ body::before {
 /* story scroll */
 .story {
   scroll-snap-type: y mandatory;
+  height: calc(100dvh - 60px);
   height: calc(100vh - 60px);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 .panel {
-  min-height: calc(100vh - 60px);
+  /* min-height: calc(100vh - 60px); */
+  min-height: 100%;
   scroll-snap-align: start;
   display: grid;
   place-items: center;
@@ -313,8 +315,11 @@ body::before {
 ========================= */
 .envelope2 {
   margin-top: 16px;
-  width: min(520px, 94vw);
-  height: 310px;
+  /* width: min(520px, 94vw); */
+  width: min(520px, 100%);
+  aspect-ratio: 520/310;
+  /* height: 310px; */
+  height: auto;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -737,9 +742,11 @@ body::before {
 /* Button playground */
 .btnArea {
   position: relative;
-  width: min(520px, 92vw);
-  margin: 12px auto 0;
-  height: 64px;
+  width: 100%;
+  /* width: min(520px, 92vw); */
+  max-width: 520px;
+  margin: 14px auto 0;
+  height: 210px;
 }
 #yesBtn {
   position: absolute;
@@ -1222,6 +1229,16 @@ body::before {
     padding: 11px 14px;
   }
 }
+/* @media (max-width: 420px) {
+  .envelope2 {
+    margin-top: 12px;
+  }
+  .env2-seal {
+    width: 46px;
+    height: 46px;
+  }
+} */
+
 .noOverlay {
   position: fixed;
   inset: 0;
@@ -1301,4 +1318,20 @@ body::before {
   gap: 10px;
   justify-content: center;
   flex-wrap: wrap;
+}
+@media (max-width: 420px) {
+  #p7 .card {
+    padding: 18px 14px;
+  }
+
+  #p7 .sticker {
+    width: 132px;
+    margin: 0 auto 8px;
+  }
+
+  #p7 .btnArea {
+    width: 100%;
+    height: 180px;
+    border-radius: 22px;
+  }
 }
