@@ -414,31 +414,31 @@ function showNoPopup(msg) {
 //     { duration: 260, easing: "ease-out" }
 //   );
 // }
-function moveNoRandom() {
-  const areaRect = btnArea.getBoundingClientRect();
-  const btnRect = noBtn.getBoundingClientRect();
+// function moveNoRandom() {
+//   const areaRect = btnArea.getBoundingClientRect();
+//   const btnRect = noBtn.getBoundingClientRect();
 
-  const pad = 10;
+//   const pad = 10;
 
-  // Keep movement tighter (top-right region), so it doesn't fly too much
-  const regionW = areaRect.width * 0.55;
-  const regionH = areaRect.height * 0.45;
+//   // Keep movement tighter (top-right region), so it doesn't fly too much
+//   const regionW = areaRect.width * 0.55;
+//   const regionH = areaRect.height * 0.45;
 
-  const maxX = Math.max(pad, regionW - btnRect.width - pad);
-  const maxY = Math.max(pad, regionH - btnRect.height - pad);
+//   const maxX = Math.max(pad, regionW - btnRect.width - pad);
+//   const maxY = Math.max(pad, regionH - btnRect.height - pad);
 
-  const x = areaRect.width - regionW + (pad + Math.random() * (maxX - pad));
-  const y = pad + Math.random() * (maxY - pad);
+//   const x = areaRect.width - regionW + (pad + Math.random() * (maxX - pad));
+//   const y = pad + Math.random() * (maxY - pad);
 
-  noBtn.style.right = "auto";
-  noBtn.style.left = `${x}px`;
-  noBtn.style.top = `${y}px`;
+//   noBtn.style.right = "auto";
+//   noBtn.style.left = `${x}px`;
+//   noBtn.style.top = `${y}px`;
 
-  noBtn.animate(
-    [{ transform: "scale(1)" }, { transform: "scale(1.04)" }, { transform: "scale(1)" }],
-    { duration: 240, easing: "ease-out" }
-  );
-}
+//   noBtn.animate(
+//     [{ transform: "scale(1)" }, { transform: "scale(1.04)" }, { transform: "scale(1)" }],
+//     { duration: 240, easing: "ease-out" }
+//   );
+// }
 
 
 
@@ -475,6 +475,74 @@ function makeYesBigger() {
 
 
 
+// noBtn.addEventListener("click", () => {
+//   const msg = teaseLines[teaseIndex % teaseLines.length];
+//   showTease(msg);
+//   showNoPopup(msg);
+//   teaseIndex++;
+//   showNoModal(msg);
+
+
+//   makeYesBigger();
+//   moveNoRandom();
+//   questionGif.src = pickRandom(gifs.no);
+
+//   if (musicEnabled) playTrack(pickRandom(buckets.rejection));
+// });
+
+
+function burstHearts(targetEl) {
+  const host = targetEl || document.body;
+  const rect = host.getBoundingClientRect();
+
+  // create overlay layer
+  const layer = document.createElement("div");
+  layer.style.position = "absolute";
+  layer.style.left = `${rect.left + window.scrollX}px`;
+  layer.style.top = `${rect.top + window.scrollY}px`;
+  layer.style.width = `${rect.width}px`;
+  layer.style.height = `${rect.height}px`;
+  layer.style.pointerEvents = "none";
+  layer.style.overflow = "visible";
+  layer.style.zIndex = "9999";
+
+  document.body.appendChild(layer);
+
+  const count = 14;
+  for (let i = 0; i < count; i++) {
+    const h = document.createElement("div");
+    h.textContent = "💗";
+    h.style.position = "absolute";
+    h.style.left = "50%";
+    h.style.top = "50%";
+    h.style.transform = "translate(-50%, -50%)";
+    h.style.fontSize = `${14 + Math.random() * 12}px`;
+    h.style.filter = "drop-shadow(0 6px 12px rgba(255,70,140,0.25))";
+    layer.appendChild(h);
+
+    const angle = (Math.random() * Math.PI * 2);
+    const dist = 70 + Math.random() * 90;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist - (60 + Math.random() * 60);
+
+    const spin = (Math.random() * 140 - 70);
+    const duration = 700 + Math.random() * 450;
+
+    h.animate(
+      [
+        { transform: "translate(-50%, -50%) scale(0.9)", opacity: 0.0 },
+        { transform: "translate(-50%, -50%) scale(1.2)", opacity: 1.0, offset: 0.15 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) rotate(${spin}deg) scale(1)`, opacity: 0.0 }
+      ],
+      { duration, easing: "cubic-bezier(.2,.9,.2,1)", fill: "forwards" }
+    );
+  }
+
+  setTimeout(() => layer.remove(), 1400);
+}
+
+
+let noClicks = 0;
 noBtn.addEventListener("click", () => {
   const msg = teaseLines[teaseIndex % teaseLines.length];
   showTease(msg);
@@ -482,13 +550,33 @@ noBtn.addEventListener("click", () => {
   teaseIndex++;
   showNoModal(msg);
 
+  noClicks++;
 
-  makeYesBigger();
-  moveNoRandom();
+  // ✅ swap positions (2)
+  if (btnArea) btnArea.classList.toggle("swapButtons");
+
+  // ✅ romantic burst (3)
+  burstHearts(btnArea || yesBtn);
+
+  // (optional) keep your existing yes grow if you want
+  // makeYesBigger();
+
+  // YES grows
+  // makeYesBigger();
+
+  // ✅ NO must NOT move
+  noBtn.style.left = "";
+  noBtn.style.top = "";
+  noBtn.style.right = "";
+  noBtn.style.bottom = "";
+  noBtn.style.transform = "";
+
   questionGif.src = pickRandom(gifs.no);
 
   if (musicEnabled) playTrack(pickRandom(buckets.rejection));
 });
+
+
 function showNoModal(msg) {
   if (!noOverlay) return;
 
@@ -541,13 +629,13 @@ function dodgeIfClose(clientX, clientY) {
 
   if (dist < 90) {
     lastDodge = now;
-    moveNoRandom();
+    // moveNoRandom();
   }
 }
 
 if (btnArea) {
   btnArea.addEventListener("mousemove", (e) => dodgeIfClose(e.clientX, e.clientY));
-  noBtn.addEventListener("mouseenter", () => moveNoRandom());
+  // noBtn.addEventListener("mouseenter", () => moveNoRandom());
 }
 
 
@@ -624,11 +712,13 @@ backToTop.addEventListener("click", () => {
 /* ---------- NO default position reset on resize ---------- */
 
 function resetNo() {
-  noBtn.style.left = "auto";
-  noBtn.style.bottom = "auto";
-  noBtn.style.right = "26%";
-  noBtn.style.top = "22px";
-  noBtn.style.transform = "none";
+  noBtn.style.left = "";
+  noBtn.style.bottom = "";
+  noBtn.style.right = "";
+  noBtn.style.top = "";
+  noBtn.style.transform = "";
+
+  if (btnArea) btnArea.classList.remove("swapButtons");
 }
 
 window.addEventListener("load", resetNo);
