@@ -62,6 +62,50 @@ const noModalText = document.getElementById("noModalText");
 const noModalOk = document.getElementById("noModalOk");
 const noModalYes = document.getElementById("noModalYes");
 
+/* background music */
+// ===== Background audio (starts after letter continue) =====
+let bgAudio;
+
+function startBackgroundAudio() {
+  if (bgAudio) return; // already started
+
+  bgAudio = new Audio("./assets/AudioTracks/mainBG.webm");
+  bgAudio.preload = "auto";
+  bgAudio.loop = true;          // optional
+  bgAudio.volume = 0.15;        // optional (0 to 1)
+
+  // Seek safely after metadata is loaded
+  const startAt = 20; // seconds
+  bgAudio.addEventListener("loadedmetadata", () => {
+    try {
+      // if duration is shorter, start from 0
+      bgAudio.currentTime = Math.min(startAt, (bgAudio.duration || startAt) - 0.2);
+    } catch (e) {
+      // ignore (some browsers block seek until canplay)
+    }
+  });
+
+  bgAudio.addEventListener("canplay", () => {
+    // try setting again (more reliable on some browsers)
+    try { bgAudio.currentTime = 20; } catch (e) { }
+  }, { once: true });
+
+  const p = bgAudio.play();
+  if (p && typeof p.catch === "function") {
+    p.catch(() => {
+      // If browser blocks it (rare here), next click anywhere can start it
+      const resume = () => {
+        bgAudio.play().catch(() => { });
+        document.removeEventListener("click", resume);
+        document.removeEventListener("touchstart", resume);
+      };
+      document.addEventListener("click", resume, { once: true });
+      document.addEventListener("touchstart", resume, { once: true });
+    });
+  }
+}
+
+
 /* Helpers add (format time) */
 function fmtTime(s) {
   if (!isFinite(s) || s < 0) return "0:00";
@@ -114,7 +158,7 @@ let musicEnabled = false;
 musicToggle.addEventListener("click", () => {
   musicEnabled = !musicEnabled;
   musicToggle.textContent = musicEnabled ? "⏸" : "♪";
-  if (!musicEnabled) player.pause();
+  if (!musicEnabled) { player.pause(); pauseBG(); }
 });
 
 /* ---------- Buckets (for YES/NO mood) ---------- */
@@ -135,11 +179,31 @@ const buckets = {
   ]
 };
 
-function playTrack(url) {
-  player.src = url;
-  player.currentTime = 0;
-  player.play().catch(() => { });
+function pauseBG() {
+  if (bgAudio && !bgAudio.paused) bgAudio.pause();
 }
+
+player.addEventListener("play", pauseBG);
+
+function playTrack(url, opts = {}) {
+  const startAt = Number(opts.startAt || 0);
+
+  // Rule: only ONE audio at a time (stop BG + stop current player track)
+  pauseBG();
+  player.pause();
+  try { player.currentTime = 0; } catch (e) { }
+
+  player.src = url;
+
+  const seekAndPlay = () => {
+    try { player.currentTime = startAt; } catch (e) { }
+    player.play().catch(() => { });
+  };
+
+  if (player.readyState >= 1) seekAndPlay();
+  else player.addEventListener("loadedmetadata", seekAndPlay, { once: true });
+}
+
 
 /* ---------- Secret envelope ---------- */
 envelopeBtn.addEventListener("click", () => {
@@ -572,8 +636,7 @@ noBtn.addEventListener("click", () => {
   noBtn.style.transform = "";
 
   questionGif.src = pickRandom(gifs.no);
-
-  if (musicEnabled) playTrack(pickRandom(buckets.rejection));
+  // NO click par koi music play nahi hoga
 });
 
 
@@ -650,9 +713,21 @@ function unlockGifts() {
 yesBtn.addEventListener("click", () => {
   questionGif.src = pickRandom(gifs.yes);
 
+  // Keep UI toggle in sync
   musicEnabled = true;
   musicToggle.textContent = "⏸";
-  playTrack(pickRandom(buckets.love));
+
+  // ✅ YES par hamesha Qubool play hoga (53s se), and BG + any other tracks stop automatically
+  playTrack("assets/AudioTracks/Qubool.webm", { startAt: 53 });
+
+  // Now Playing UI (nice touch)
+  if (nowPlaying) nowPlaying.hidden = false;
+  if (npName) npName.textContent = "Qubool 💖";
+  if (npPlayPause) npPlayPause.textContent = "Pause";
+
+  // reset track buttons UI
+  document.querySelectorAll(".trackCard .btn").forEach(b => b.textContent = "Play");
+  currentProgress = null;
 
   unlockGifts();
 
@@ -660,7 +735,6 @@ yesBtn.addEventListener("click", () => {
     document.getElementById("p8").scrollIntoView({ behavior: "smooth", block: "start" });
   }, 350);
 });
-
 /* ---------- Gift modal content ---------- */
 const giftContent = {
   1: {
@@ -849,6 +923,7 @@ aur honestly… I miss those moments.`;
   if (letterContinue) {
     letterContinue.addEventListener("click", () => {
       hideLetterOverlay();
+      startBackgroundAudio();
     });
   }
 
@@ -877,7 +952,6 @@ aur honestly… I miss those moments.`;
 
   ];
 
-  const STORAGE_KEY = "valentine_unlocked_v1";
 
   const normalize = (s) =>
     (s || "")
