@@ -1390,3 +1390,291 @@ body::before {
 #p7 #btnArea.swapButtons {
   flex-direction: row-reverse;
 }
+
+/* overlay page password page  */
+.lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background:
+    radial-gradient(
+      1200px 800px at 20% 20%,
+      rgba(255, 0, 128, 0.25),
+      transparent 60%
+    ),
+    radial-gradient(
+      1000px 700px at 80% 30%,
+      rgba(255, 170, 200, 0.22),
+      transparent 55%
+    ),
+    rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(10px);
+}
+
+.lock-card {
+  width: min(520px, 100%);
+  border-radius: 22px;
+  padding: 18px 18px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(20, 20, 28, 0.55);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  color: #fff;
+}
+
+.lock-top .badge {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.lock-top .title {
+  font-size: 22px;
+  margin: 0 0 6px;
+}
+
+.lock-top .sub {
+  margin: 0 0 14px;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+.progress {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  margin: 6px 0 14px;
+}
+.progress .bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff4da6, #ff2d55, #ff8bd2);
+  border-radius: 999px;
+  transition: width 250ms ease;
+}
+
+.qa .q {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.answer {
+  width: 100%;
+  border-radius: 14px;
+  padding: 14px 14px;
+  font-size: 15px;
+  outline: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.answer::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.hint {
+  margin-top: 10px;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.error {
+  min-height: 18px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #ffd1e6;
+  opacity: 0.95;
+}
+
+.unlock-btn {
+  margin-top: 12px;
+  width: 100%;
+  border: none;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(90deg, #ff2d55, #ff4da6);
+  box-shadow: 0 14px 34px rgba(255, 45, 85, 0.28);
+  transition: transform 120ms ease;
+}
+
+.unlock-btn:active {
+  transform: scale(0.98);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  gap: 12px;
+  opacity: 0.85;
+  font-size: 13px;
+}
+
+.skip-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+
+/* =========================
+   LOVE LETTER OVERLAY (after unlock)
+========================= */
+.letter-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  display: none; /* enabled via JS */
+  place-items: center;
+  padding: 18px;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 360ms ease, transform 360ms ease;
+  background:
+    radial-gradient(1100px 600px at 18% 12%, rgba(255, 236, 186, 0.65), transparent 60%),
+    radial-gradient(900px 600px at 88% 28%, rgba(255, 209, 220, 0.55), transparent 62%),
+    linear-gradient(180deg, rgba(255, 252, 238, 0.96), rgba(255, 244, 220, 0.96));
+  backdrop-filter: blur(10px);
+}
+.letter-overlay::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  /* subtle paper grain */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.10'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  opacity: 0.22;
+  pointer-events:none;
+}
+.letter-overlay.show{
+  opacity: 1;
+  transform: scale(1);
+}
+.letter-overlay.fadeout{
+  opacity: 0;
+  transform: scale(0.985);
+}
+
+.letter-stage{
+  position: relative;
+  width: min(560px, 92vw);
+}
+
+.paper{
+  position: relative;
+  width: 100%;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 61, 127, 0.14);
+  background:
+    /* warm paper base */
+    linear-gradient(180deg, rgba(255, 251, 239, 0.96), rgba(255, 244, 222, 0.96));
+  box-shadow: 0 38px 120px rgba(42, 27, 34, 0.22);
+  overflow: hidden;
+}
+
+/* notebook lines + margin */
+.paper::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    /* left margin */
+    linear-gradient(90deg, rgba(255, 115, 160, 0.18), rgba(255, 115, 160, 0.18)) 42px 0/2px 100% no-repeat,
+    /* lines */
+    repeating-linear-gradient(
+      180deg,
+      rgba(42, 27, 34, 0.00) 0px,
+      rgba(42, 27, 34, 0.00) 26px,
+      rgba(42, 27, 34, 0.07) 27px,
+      rgba(42, 27, 34, 0.07) 28px
+    );
+  opacity: 0.9;
+  pointer-events:none;
+}
+
+.paper-inner{
+  position: relative;
+  min-height: min(520px, 78vh);
+  padding: 28px 22px 18px;
+  padding-left: 58px; /* align after margin line */
+  color: rgba(25, 15, 10, 0.92);
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+
+  /* future-proof layout */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.paper-title{
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 0.02em;
+}
+
+.typewrap{
+  line-height: 1.7;
+  font-size: 16px;
+  flex: 1;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.typed{ white-space: pre-wrap; }
+
+.caret{
+  display:inline-block;
+  margin-left: 2px;
+  opacity: 0.8;
+  animation: blink 0.85s infinite;
+}
+
+.signature{
+  margin-top: 4px;
+  font-size: 16px;
+  opacity: 0.85;
+  font-style: italic;
+}
+
+.letter-continue{
+  width: 100%;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(90deg, #ff2d55, #ff4da6);
+  box-shadow: 0 16px 38px rgba(255, 45, 85, 0.22);
+}
+
+.smallnote{
+  font-size: 12px;
+  opacity: 0.65;
+  margin-top: 2px;
+}
+
+@media (max-width: 520px){
+  .paper-inner{
+    padding: 24px 18px 16px;
+    padding-left: 52px;
+    min-height: min(500px, 80vh);
+  }
+  .paper-title{ font-size: 22px; }
+  .typewrap{ font-size: 15px; }
+}

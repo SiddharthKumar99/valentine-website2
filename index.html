@@ -15,6 +15,79 @@
   </head>
 
   <body>
+    <!-- LOCK SCREEN OVERLAY -->
+    <div id="lockOverlay" class="lock-overlay" aria-hidden="true">
+      <div class="lock-card">
+        <div class="lock-top">
+          <div class="badge">A LITTLE LOVE CHECK 💗</div>
+          <h2 class="title">Answer to unlock our story</h2>
+          <p class="sub">Small quiz. Big feelings. 😌</p>
+        </div>
+
+        <div class="progress">
+          <div id="progressBar" class="bar"></div>
+        </div>
+
+        <div class="qa">
+          <div class="q" id="questionText">Loading...</div>
+
+          <input
+            id="answerInput"
+            class="answer"
+            type="text"
+            placeholder="Type your answer…"
+            autocomplete="off"
+            spellcheck="false" />
+
+          <div class="hint" id="hintText">
+            Hint: It’s something only you’d know 😉
+          </div>
+          <div class="error" id="errorText"></div>
+
+          <button id="unlockBtn" class="unlock-btn">Unlock 🔓</button>
+
+          <div class="footer">
+            <span id="qCounter">Question 1/2</span>
+            <button id="skipBtn" class="skip-btn" type="button">
+              I forgot 🥺
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOVE LETTER OVERLAY (shows after unlock) -->
+    <div id="letterOverlay" class="letter-overlay" aria-hidden="true">
+      <div
+        class="letter-stage"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Love letter">
+        <div class="paper">
+          <div class="paper-inner">
+            <h2 class="paper-title">My Love,</h2>
+
+            <div class="typewrap" aria-live="polite">
+              <span id="typedText" class="typed"></span
+              ><span id="caret" class="caret">|</span>
+            </div>
+
+            <div id="signature" class="signature" hidden>— always yours ❤️</div>
+
+            <button
+              id="letterContinue"
+              class="letter-continue"
+              type="button"
+              hidden>
+              Continue
+            </button>
+
+            <div class="smallnote">Tap anywhere to continue 💌</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Soft background blobs -->
     <div class="blob b1" aria-hidden="true"></div>
     <div class="blob b2" aria-hidden="true"></div>

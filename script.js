@@ -1,12 +1,12 @@
 /* =====================================================
-   Final Scroll Valentine (Divya)
-   - Scroll-snap flow + prev/next floating controls
-   - Progress dots (IntersectionObserver)
-   - Envelope v2 open/close
-   - Memories: gift -> fade reveal
-   - Soundtrack: track cards + play/pause + progress + shuffle/stop
-   - Question: NO random move + tease text, YES grows & unlock gifts
-   - Gift section: locked until YES, modal gifts
+ Final Scroll Valentine (Divya)
+ - Scroll-snap flow + prev/next floating controls
+ - Progress dots (IntersectionObserver)
+ - Envelope v2 open/close
+ - Memories: gift -> fade reveal
+ - Soundtrack: track cards + play/pause + progress + shuffle/stop
+ - Question: NO random move + tease text, YES grows & unlock gifts
+ - Gift section: locked until YES, modal gifts
 ===================================================== */
 
 const story = document.getElementById("story");
@@ -723,3 +723,246 @@ function resetNo() {
 
 window.addEventListener("load", resetNo);
 window.addEventListener("resize", resetNo);
+
+/* overlay script password page script */
+(() => {
+  const overlay = document.getElementById("lockOverlay");
+  const questionText = document.getElementById("questionText");
+  const answerInput = document.getElementById("answerInput");
+  const hintText = document.getElementById("hintText");
+  const errorText = document.getElementById("errorText");
+  const unlockBtn = document.getElementById("unlockBtn");
+  const qCounter = document.getElementById("qCounter");
+  const progressBar = document.getElementById("progressBar");
+  const skipBtn = document.getElementById("skipBtn");
+
+  /* =========================
+     Love Letter Overlay (after unlock)
+  ========================= */
+  const letterOverlay = document.getElementById("letterOverlay");
+  const typedTextEl = document.getElementById("typedText");
+  const caretEl = document.getElementById("caret");
+  const signatureEl = document.getElementById("signature");
+  const letterContinue = document.getElementById("letterContinue");
+
+  // You can change this content anytime (layout stays safe)
+  const LETTER_TEXT =
+    `I know this is a tiny website... but it’s my way of saying one thing clearly.
+
+You are my safest place.
+My favorite notification.
+And my “everything is okay” feeling.
+
+If you’re reading this... then yes —
+I still choose you. Every day.`;
+
+  let typingDone = false;
+  let typingTimer = null;
+
+  function showLetterOverlay() {
+    if (!letterOverlay) return;
+
+    // reset state each time (fresh on reload)
+    typingDone = false;
+    if (typingTimer) clearTimeout(typingTimer);
+    typedTextEl.textContent = "";
+    signatureEl.hidden = true;
+    letterContinue.hidden = true;
+    caretEl.style.display = "inline-block";
+
+    letterOverlay.style.display = "grid";
+    // allow transition to apply
+    requestAnimationFrame(() => letterOverlay.classList.add("show"));
+    startTyping(LETTER_TEXT);
+  }
+
+  function hideLetterOverlay() {
+    if (!letterOverlay) return;
+
+    letterOverlay.classList.remove("show");
+    letterOverlay.classList.add("fadeout");
+    setTimeout(() => {
+      letterOverlay.classList.remove("fadeout");
+      letterOverlay.style.display = "none";
+    }, 380);
+  }
+
+  function instantFinishTyping() {
+    if (typingTimer) clearTimeout(typingTimer);
+    typedTextEl.textContent = LETTER_TEXT;
+    typingDone = true;
+    caretEl.style.display = "none";
+    signatureEl.hidden = false;
+    letterContinue.hidden = false;
+  }
+
+  function calcDelay(ch) {
+    // slower + cute pauses
+    if (ch === "." || ch === ",") return 180;
+    if (ch === "—") return 220;
+    if (ch === "\n") return 240;
+    return 55;
+  }
+
+  function startTyping(text) {
+    let i = 0;
+    function step() {
+      typedTextEl.textContent += text[i] ?? "";
+      const d = calcDelay(text[i] ?? "");
+      i += 1;
+
+      // auto-scroll to keep latest line visible (future-proof for long text)
+      typedTextEl.parentElement.scrollTop = typedTextEl.parentElement.scrollHeight;
+
+      if (i < text.length) {
+        typingTimer = setTimeout(step, d);
+      } else {
+        typingDone = true;
+        caretEl.style.display = "none";
+        signatureEl.hidden = false;
+        letterContinue.hidden = false;
+      }
+    }
+    typingTimer = setTimeout(step, 380); // small initial delay
+  }
+
+  // tap anywhere to continue
+  if (letterOverlay) {
+    letterOverlay.addEventListener("click", (e) => {
+      // If they clicked the button, the button handler will run
+      if (e.target && e.target.id === "letterContinue") return;
+
+      if (!typingDone) {
+        instantFinishTyping();
+        return;
+      }
+      hideLetterOverlay();
+    });
+  }
+
+  if (letterContinue) {
+    letterContinue.addEventListener("click", () => {
+      hideLetterOverlay();
+    });
+  }
+
+
+
+  // ✅ EDIT THESE (make it personal)
+  const questions = [
+    {
+      q: "What’s my favorite dessert? 🍰",
+      a: ["gulab jamun", "gulabjamun"],   // accepted answers
+      hint: "Hint: Indian sweet 😋"
+    },
+    {
+      q: "What do I call you when I’m extra happy? 😚",
+      a: ["baby", "jaan", "shona", "love"], // accepted answers
+      hint: "Hint: A cute nickname 💗"
+    }
+  ];
+
+  const cuteWrong = [
+    "Hmmm… not the one. Try again, my love 💖",
+    "Nope 😌 but you’re still cute.",
+    "Close-ish… but not quite 😭",
+    "Think harder… I believe in you 🥺"
+  ];
+
+  const STORAGE_KEY = "valentine_unlocked_v1";
+
+  const normalize = (s) =>
+    (s || "")
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ""); // remove spaces
+
+  let idx = 0;
+  let tries = 0;
+
+  function showOverlay() {
+    overlay.style.display = "grid";
+    overlay.setAttribute("aria-hidden", "false");
+    render();
+    setTimeout(() => answerInput.focus(), 150);
+  }
+
+  function hideOverlay() {
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+  }
+
+  function render() {
+    const total = questions.length;
+    const item = questions[idx];
+    questionText.textContent = item.q;
+    hintText.textContent = item.hint;
+    qCounter.textContent = `Question ${idx + 1}/${total}`;
+    progressBar.style.width = `${(idx / total) * 100}%`;
+    errorText.textContent = "";
+    answerInput.value = "";
+  }
+
+  function unlockSuccess() {
+    progressBar.style.width = "100%";
+    // localStorage.setItem(STORAGE_KEY, "yes");
+    // cute little exit animation feel
+    overlay.style.opacity = "0";
+    overlay.style.transform = "scale(1.01)";
+    overlay.style.transition = "opacity 250ms ease, transform 250ms ease";
+    setTimeout(() => { hideOverlay(); showLetterOverlay(); }, 260);
+  }
+
+  function checkAnswer() {
+    const item = questions[idx];
+    const input = normalize(answerInput.value);
+    const ok = item.a.map(normalize).includes(input);
+
+    if (ok) {
+      idx++;
+      tries = 0;
+
+      if (idx >= questions.length) {
+        unlockSuccess();
+      } else {
+        render();
+      }
+      return;
+    }
+
+    // wrong answer
+    tries++;
+    errorText.textContent = cuteWrong[Math.floor(Math.random() * cuteWrong.length)];
+
+    // optional: after 3 wrong tries show stronger hint
+    if (tries >= 3) {
+      hintText.textContent = item.hint + " (Think of our chats 😌)";
+    }
+
+    // tiny shake animation
+    overlay.animate(
+      [{ transform: "translateX(0px)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "translateX(0px)" }],
+      { duration: 220, iterations: 1 }
+    );
+  }
+
+  // “I forgot” -> show answer style hint (without revealing fully)
+  skipBtn.addEventListener("click", () => {
+    const item = questions[idx];
+    errorText.textContent = `Okay 🥺 it starts with “${item.a[0][0].toUpperCase()}”`;
+    answerInput.focus();
+  });
+
+  unlockBtn.addEventListener("click", checkAnswer);
+
+  answerInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") checkAnswer();
+  });
+
+  // boot
+  // const unlocked = localStorage.getItem(STORAGE_KEY) === "yes";
+  // if (!unlocked) showOverlay();
+  // else hideOverlay();
+  showOverlay()
+})();
