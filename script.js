@@ -747,14 +747,20 @@ window.addEventListener("resize", resetNo);
 
   // You can change this content anytime (layout stays safe)
   const LETTER_TEXT =
-    `I know this is a tiny website... but it’s my way of saying one thing clearly.
+    `Pata hai divya… hum na sirf 3 months se saath hain,
+but kabhi aisa laga hi nahi ki ye bas "just 3 months hue".
 
-You are my safest place.
-My favorite notification.
-And my “everything is okay” feeling.
+It feels like we’ve been together for so long, and already shared so many moments —
+cute memories, quality time, aur thodi si duniya saath explore ki.
 
-If you’re reading this... then yes —
-I still choose you. Every day.`;
+Ye humara first Valentine hai,
+aur main is relationship ke liye genuinely grateful hoon.
+Haan, kuch cheezein perfect nahi thi,
+but mujhe lagta hai agar hum saath hote,
+to sab kuch solve ho sakta hai.
+
+Aajkal humari baat nahi hoti,
+aur honestly… I miss those moments.`;
 
   let typingDone = false;
   let typingTimer = null;
@@ -851,14 +857,14 @@ I still choose you. Every day.`;
   // ✅ EDIT THESE (make it personal)
   const questions = [
     {
-      q: "What’s my favorite dessert? 🍰",
-      a: ["gulab jamun", "gulabjamun"],   // accepted answers
-      hint: "Hint: Indian sweet 😋"
+      q: "Humne first time jab bat ki wo kon sa din th..??",
+      a: ["sunday", "Sunday", "SUNDAY"],   // accepted answers
+      hint: "Hint: Wednesday, Friday, Valentine-Day, "
     },
     {
-      q: "What do I call you when I’m extra happy? 😚",
-      a: ["baby", "jaan", "shona", "love"], // accepted answers
-      hint: "Hint: A cute nickname 💗"
+      q: "Jab mai tumhe irritate krta hu ya extra Love ❤️ show krta hu tum kya kahti ho mujhe",
+      a: ["bahe", "chup rho aap", "pta hai mujhe", "chup rho"], // accepted answers
+      hint: "Hint: socho babu socho"
     }
   ];
 
@@ -866,7 +872,9 @@ I still choose you. Every day.`;
     "Hmmm… not the one. Try again, my love 💖",
     "Nope 😌 but you’re still cute.",
     "Close-ish… but not quite 😭",
-    "Think harder… I believe in you 🥺"
+    "Think harder… I believe in you 🥺",
+    "help kar deta hu -( chup ho jao, pagal, i know ) but in your way"
+
   ];
 
   const STORAGE_KEY = "valentine_unlocked_v1";
