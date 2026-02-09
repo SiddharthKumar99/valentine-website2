@@ -283,6 +283,12 @@ body::before {
   margin: 0;
 }
 
+/* Gift modal sticker (bigger + centered) */
+.modal .sticker.sm{
+  width: 140px;
+  margin: 0 auto 12px;
+}
+
 @keyframes floaty {
   0%,
   100% {
@@ -928,6 +934,8 @@ body::before {
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 10px;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (min-width: 760px) {

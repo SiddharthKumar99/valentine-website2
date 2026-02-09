@@ -37,12 +37,12 @@ const noPopupGif = document.getElementById("noPopupGif");
 const noPopupText = document.getElementById("noPopupText");
 
 const giftRow = document.getElementById("giftRow");
+const giftUnlockTitle = document.getElementById("giftUnlockTitle");
 const giftLockHint = document.getElementById("giftLockHint");
 const backToTop = document.getElementById("backToTop");
 
 const overlay = document.getElementById("overlay");
 const closeBtn = document.getElementById("closeBtn");
-const modalMusicBtn = document.getElementById("modalMusicBtn");
 const modalGif = document.getElementById("modalGif");
 const modalKicker = document.getElementById("modalKicker");
 const modalTitle = document.getElementById("modalTitle");
@@ -708,6 +708,21 @@ function unlockGifts() {
   giftRow.classList.remove("locked");
   giftLockHint.textContent = "Unlocked ✅";
   giftLockHint.style.color = "rgba(42,27,34,0.75)";
+  // Update heading after YES
+  // if (giftUnlockTitle) giftUnlockTitle.textContent = "Love youuu… I knew you’d say YES 😘";
+  if (giftUnlockTitle) {
+    giftUnlockTitle.innerHTML = `
+    <span class="unlock-text">
+      Love youuu… I knew you’d say YES 😘
+    </span>
+    <img 
+      src="assets/GifData/Yes/love1.gif" 
+      alt="love"
+      class="unlock-img"
+    />
+  `;
+  }
+
 }
 
 yesBtn.addEventListener("click", () => {
@@ -772,11 +787,6 @@ document.querySelectorAll(".giftCardBig").forEach((btn) => {
 closeBtn.addEventListener("click", () => overlay.classList.remove("show"));
 overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.classList.remove("show"); });
 
-modalMusicBtn.addEventListener("click", () => {
-  musicEnabled = true;
-  musicToggle.textContent = "⏸";
-  playTrack(pickRandom(buckets.love));
-});
 
 /* ---------- Back to top ---------- */
 backToTop.addEventListener("click", () => {
