@@ -94,7 +94,7 @@
     <div class="blob b3" aria-hidden="true"></div>
 
     <header class="topbar">
-      <div class="brand">for Divya</div>
+      <div class="brand">for You..</div>
 
       <div class="right">
         <button
@@ -154,9 +154,9 @@
             src="./assets/GifData/heart.gif"
             alt="cute gif" />
           <p class="kicker">a quiet truth</p>
-          <p class="big">I choose you.</p>
-          <p class="big">Again…</p>
-          <p class="big">and again.</p>
+          <p class="big">Mujhe lga th utna hard nhi hoga akele rhna</p>
+          <p class="big">but 😓, yaha to pucha mat kya haal hai</p>
+          <p class="big"></p>
           <p class="subtle">No noise. Just intention.</p>
         </div>
       </section>
@@ -382,7 +382,9 @@
       <section class="panel" id="p8" data-title="Gifts">
         <div class="card center giftsCard">
           <p class="kicker">gifts for you 🎁</p>
-          <h2 class="title centerTitle" id="giftUnlockTitle">They unlock after you say YES 😌</h2>
+          <h2 class="title centerTitle" id="giftUnlockTitle">
+            They unlock after you say YES 😌
+          </h2>
 
           <div class="giftGridBig locked" id="giftRow">
             <button class="giftCardBig" data-gift="1" type="button">
@@ -459,9 +461,9 @@
           <button class="btn btnGlow" id="closeBtn" type="button">
             Aww ❤️
           </button>
-</div>
+        </div>
 
-        <p class="micro">(Edit gift text in script.js)</p>
+        <!-- <p class="micro">(Edit gift text in script.js)</p> -->
       </div>
     </div>
     <!-- NO Modal (full popup) -->
@@ -485,6 +487,34 @@
         </div>
       </div>
     </div>
+    <!-- ===== HEART MEMORIES POPUP (CANVAS MOSAIC) ===== -->
+    <div id="heartMemoriesModal" class="hm-overlay" aria-hidden="true">
+      <div
+        class="hm-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Heart Memories">
+        <button class="hm-close" id="hmCloseBtn" aria-label="Close">✕</button>
+
+        <header class="hm-head">
+          <h2 class="hm-title">
+            I Love You Forever <span class="hm-emoji">💘</span>
+          </h2>
+          <p class="hm-sub">Our little memories in one heart.</p>
+        </header>
+
+        <div class="hm-stage">
+          <div class="hm-heartCanvasWrap" id="hmCanvasWrap">
+            <canvas id="hmCanvas"></canvas>
+          </div>
+        </div>
+
+        <footer class="hm-foot">
+          <button class="hm-btn" id="hmOkBtn">Aww okay 💋</button>
+        </footer>
+      </div>
+    </div>
+    <!-- ===== /HEART MEMORIES POPUP ===== -->
 
     <audio id="player" preload="auto"></audio>
     <script src="./script.js"></script>

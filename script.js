@@ -72,7 +72,7 @@ function startBackgroundAudio() {
   bgAudio = new Audio("./assets/AudioTracks/mainBG.webm");
   bgAudio.preload = "auto";
   bgAudio.loop = true;          // optional
-  bgAudio.volume = 0.15;        // optional (0 to 1)
+  bgAudio.volume = 0.10;        // optional (0 to 1)
 
   // Seek safely after metadata is loaded
   const startAt = 20; // seconds
@@ -715,6 +715,7 @@ function unlockGifts() {
     <span class="unlock-text">
       Love youuu… I knew you’d say YES 😘
     </span>
+    <br/>
     <img 
       src="assets/GifData/Yes/love1.gif" 
       alt="love"
@@ -745,6 +746,9 @@ yesBtn.addEventListener("click", () => {
   currentProgress = null;
 
   unlockGifts();
+  // openCollageModal();
+  openHeartMemoriesModal();
+
 
   setTimeout(() => {
     document.getElementById("p8").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -943,7 +947,7 @@ aur honestly… I miss those moments.`;
   const questions = [
     {
       q: "Humne first time jab bat ki wo kon sa din th..??",
-      a: ["sunday", "Sunday", "SUNDAY"],   // accepted answers
+      a: ["sunday"],   // accepted answers
       hint: "Hint: Wednesday, Friday, Valentine-Day, "
     },
     {
@@ -1058,3 +1062,250 @@ aur honestly… I miss those moments.`;
   // else hideOverlay();
   showOverlay()
 })();
+const hmModal = document.getElementById("heartMemoriesModal");
+const hmCloseBtn = document.getElementById("hmCloseBtn");
+const hmOkBtn = document.getElementById("hmOkBtn");
+const hmCanvas = document.getElementById("hmCanvas");
+const hmWrap = document.getElementById("hmCanvasWrap");
+
+/* ✅ Put your 40 image paths here */
+const HEART_IMAGES = [
+  "assets/ourImages/1.jpg",
+  "assets/ourImages/2.jpg",
+  "assets/ourImages/3.jpg",
+  "assets/ourImages/4.jpg",
+  "assets/ourImages/5.jpg",
+  "assets/ourImages/6.jpg",
+  "assets/ourImages/7.jpg",
+  "assets/ourImages/8.jpg",
+  "assets/ourImages/9.jpg",
+  "assets/ourImages/10.jpg",
+  "assets/ourImages/11.jpg",
+  "assets/ourImages/12.jpg",
+  "assets/ourImages/13.jpg",
+  "assets/ourImages/14.jpg",
+  "assets/ourImages/15.jpg",
+  "assets/ourImages/16.jpg",
+  "assets/ourImages/17.jpg",
+  "assets/ourImages/18.jpg",
+  "assets/ourImages/19.jpg",
+  "assets/ourImages/20.jpg",
+  "assets/ourImages/21.jpg",
+  "assets/ourImages/22.jpg",
+  "assets/ourImages/23.jpg",
+  "assets/ourImages/24.jpg",
+  "assets/ourImages/25.jpg",
+  "assets/ourImages/26.jpg",
+  "assets/ourImages/27.jpg",
+  "assets/ourImages/28.jpg",
+  "assets/ourImages/29.jpg",
+  "assets/ourImages/30.jpg",
+  "assets/ourImages/31.jpg",
+  "assets/ourImages/32.jpg",
+  "assets/ourImages/33.jpg",
+  "assets/ourImages/34.jpg",
+  "assets/ourImages/35.jpg",
+  "assets/ourImages/36.jpg",
+  "assets/ourImages/37.jpg",
+  "assets/ourImages/38.jpg",
+  "assets/ourImages/39.jpg",
+  "assets/ourImages/40.jpg",
+];
+
+function openHeartMemoriesModal() {
+  hmModal.classList.add("is-open");
+  hmModal.setAttribute("aria-hidden", "false");
+  drawHeartMosaic(HEART_IMAGES);
+}
+
+function closeHeartMemoriesModal() {
+  hmModal.classList.remove("is-open");
+  hmModal.setAttribute("aria-hidden", "true");
+}
+
+hmCloseBtn?.addEventListener("click", closeHeartMemoriesModal);
+hmOkBtn?.addEventListener("click", closeHeartMemoriesModal);
+hmModal?.addEventListener("click", (e) => { if (e.target === hmModal) closeHeartMemoriesModal(); });
+
+window.addEventListener("resize", () => {
+  if (hmModal.classList.contains("is-open")) drawHeartMosaic(HEART_IMAGES);
+});
+
+function heartPath(ctx, w, h) {
+  // normalize heart to canvas size
+  ctx.beginPath();
+  ctx.moveTo(w * 0.5, h * 0.92);
+
+  ctx.bezierCurveTo(w * 0.35, h * 0.83, w * 0.14, h * 0.70, w * 0.14, h * 0.40);
+  ctx.bezierCurveTo(w * 0.14, h * 0.25, w * 0.25, h * 0.16, w * 0.36, h * 0.19);
+  ctx.bezierCurveTo(w * 0.43, h * 0.21, w * 0.47, h * 0.28, w * 0.50, h * 0.34);
+
+  ctx.bezierCurveTo(w * 0.53, h * 0.28, w * 0.57, h * 0.21, w * 0.64, h * 0.19);
+  ctx.bezierCurveTo(w * 0.75, h * 0.16, w * 0.86, h * 0.25, w * 0.86, h * 0.40);
+  ctx.bezierCurveTo(w * 0.86, h * 0.70, w * 0.65, h * 0.83, w * 0.50, h * 0.92);
+
+  ctx.closePath();
+}
+
+async function loadImages(srcs) {
+  const imgs = await Promise.all(srcs.map(src => new Promise((res) => {
+    const im = new Image();
+    im.crossOrigin = "anonymous";
+    im.onload = () => res(im);
+    im.onerror = () => res(null);
+    im.src = src;
+  })));
+  return imgs.filter(Boolean);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+async function drawHeartMosaic(srcs) {
+  if (!hmCanvas || !hmWrap) return;
+
+  const rect = hmWrap.getBoundingClientRect();
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+
+  hmCanvas.width = Math.floor(rect.width * dpr);
+  hmCanvas.height = Math.floor(rect.height * dpr);
+
+  const ctx = hmCanvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const w = rect.width;
+  const h = rect.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Heart background
+  ctx.save();
+  heartPath(ctx, w, h);
+  ctx.clip();
+
+  const grd = ctx.createLinearGradient(0, 0, w, h);
+  grd.addColorStop(0, "rgba(255,92,144,0.78)");
+  grd.addColorStop(1, "rgba(255,64,120,0.55)");
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, w, h);
+
+  const images = await loadImages(srcs);
+  const pics = shuffle(images);
+  if (!pics.length) {
+    ctx.restore();
+    return;
+  }
+
+  // TILE SIZE: small tiles => heart shape clear
+  const tile = Math.max(46, Math.min(86, Math.floor(w / 9)));
+  const gap = Math.max(6, Math.floor(tile * 0.10));
+
+  let idx = 0;
+
+  // draw grid tiles, but only inside heart clip
+  for (let y = 0; y < h; y += (tile + gap)) {
+    for (let x = 0; x < w; x += (tile + gap)) {
+      const im = pics[idx % pics.length];
+      idx++;
+
+      // little random jitter for “collage vibe”
+      const jx = (Math.random() - 0.5) * gap;
+      const jy = (Math.random() - 0.5) * gap;
+
+      const px = x + jx;
+      const py = y + jy;
+
+      // draw polaroid frame
+      const r = 14;
+      const fw = tile;
+      const fh = tile * 1.08;
+
+      // white frame
+      ctx.save();
+      ctx.beginPath();
+      roundRect(ctx, px, py, fw, fh, r);
+      ctx.fillStyle = "rgba(255,255,255,0.96)";
+      ctx.fill();
+
+      // inner image
+      const pad = Math.floor(fw * 0.10);
+      const ix = px + pad;
+      const iy = py + pad;
+      const iw = fw - pad * 2;
+      const ih = fh - pad * 2 - Math.floor(fh * 0.10);
+
+      // cover-crop draw
+      drawCover(ctx, im, ix, iy, iw, ih);
+
+      // soft shadow
+      ctx.shadowColor = "rgba(0,0,0,0.22)";
+      ctx.shadowBlur = 16;
+      ctx.shadowOffsetY = 8;
+
+      ctx.restore();
+    }
+  }
+
+  ctx.restore();
+
+  // Heart outline + drop shadow
+  ctx.save();
+  ctx.lineWidth = Math.max(3, w * 0.007);
+  ctx.strokeStyle = "rgba(255,255,255,0.22)";
+  ctx.shadowColor = "rgba(0,0,0,0.25)";
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 18;
+  heartPath(ctx, w, h);
+  ctx.stroke();
+  ctx.restore();
+
+  // bottom shadow (outside heart)
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,0.20)";
+  ctx.filter = "blur(10px)";
+  ctx.beginPath();
+  ctx.ellipse(w * 0.5, h * 0.90, w * 0.22, h * 0.03, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  const rr = Math.min(r, w / 2, h / 2);
+  ctx.moveTo(x + rr, y);
+  ctx.arcTo(x + w, y, x + w, y + h, rr);
+  ctx.arcTo(x + w, y + h, x, y + h, rr);
+  ctx.arcTo(x, y + h, x, y, rr);
+  ctx.arcTo(x, y, x + w, y, rr);
+  ctx.closePath();
+}
+
+function drawCover(ctx, img, x, y, w, h) {
+  const ir = img.width / img.height;
+  const rr = w / h;
+
+  let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+  if (ir > rr) {
+    // image wider
+    sh = img.height;
+    sw = sh * rr;
+    sx = (img.width - sw) / 2;
+  } else {
+    // image taller
+    sw = img.width;
+    sh = sw / rr;
+    sy = (img.height - sh) / 2;
+  }
+
+  ctx.save();
+  ctx.beginPath();
+  roundRect(ctx, x, y, w, h, Math.min(14, w * 0.16));
+  ctx.clip();
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  ctx.restore();
+}
