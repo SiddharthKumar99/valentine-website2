@@ -757,18 +757,18 @@ yesBtn.addEventListener("click", () => {
 /* ---------- Gift modal content ---------- */
 const giftContent = {
   1: {
-    title: "Gift 1",
-    text: "A small promise: I’ll keep choosing you — softly, daily. ❤️",
+    title: "Pata hai....",
+    text: "I've never been good at telling people how i feel but you make me want to try. ❤️",
     gif: "./assets/GifData/Yes/lovecutie2.gif"
   },
   2: {
-    title: "Gift 2",
-    text: "A cute reminder: you’re my peace. My favorite feeling. 🥺",
+    title: "Suno",
+    text: "Tumhe pata hai - Meri pasand hamesa lajawaab hoti hai, yakeen nhi to apne aap ko dekh lo 😉",
     gif: "./assets/GifData/Yes/lovecutie6.gif"
   },
   3: {
-    title: "Gift 3",
-    text: "A dramatic line: I don’t want perfect… I want YOU. 💝",
+    title: "Ek kaam kro",
+    text: "smile 😉 smile 😁 smile 😊 smile 😆 smile 🤪 smile 😛 smile 😜 smile 😋 smile 😁 smile 😊 smile 😉 smile 😁 smile 😊 smile 😆 smile 🤪 smile 😛 smile 😜 smile 😋 smile 😁 smile ",
     gif: "./assets/GifData/Yes/lovecutie9.gif"
   }
 };
@@ -845,7 +845,7 @@ Ye humara first Valentine hai,
 aur main is relationship ke liye genuinely grateful hoon.
 Haan, kuch cheezein perfect nahi thi,
 but mujhe lagta hai agar hum saath hote,
-to sab kuch solve ho sakta hai.
+to sab kuch solve ho sakta th.
 
 Aajkal humari baat nahi hoti,
 aur honestly… I miss those moments.`;
